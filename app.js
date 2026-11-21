@@ -7,6 +7,8 @@
 
   const C = window.CommerceCore;
   const D = window.CommerceData;
+  const P = window.ProConnector || null; // engines/pro-api-connector.js
+  const PS = window.ProStudio ? window.ProStudio.create(P) : null; // engines/pro-studio.js
   const $ = function (sel) { return document.querySelector(sel); };
   const $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
 
@@ -44,6 +46,8 @@
     compet: { rows: [], sort: 'recommend' },
     /* AI 브리지 */
     bridge: { task: 'copy', result: '', copy: '', designNote: '', faqs: [], names: [] },
+    /* Pro AI 완성 카피 (연결했을 때만 채워진다) */
+    pro: { kit: null, meta: '', busy: false, at: '' },
     items: [],
     filter: 'all',
     sort: 'recent',
@@ -372,7 +376,16 @@
       weakness: state.weakness, keyword: state.keyword,
     });
 
-    $('#headlineList').innerHTML = lastKit.headlines.map(function (h, i) {
+    const pro = state.pro.kit;
+    const proHead = pro && pro.headline ? '<div class="headline is-pro">' +
+      '<span class="h-no">P</span>' +
+      '<span class="h-main"><span class="h-type">Pro 헤드라인 · ' + C.codePoints(pro.headline) + '자</span>' +
+      '<span class="h-text">' + C.escapeHtml(pro.headline) + '</span>' +
+      (pro.subheadline ? '<span class="h-sub">' + C.escapeHtml(pro.subheadline) + '</span>' : '') + '</span>' +
+      '<button class="btn btn-ghost h-copy" data-action="copy-pro-copy">복사</button>' +
+      '</div>' : '';
+
+    $('#headlineList').innerHTML = proHead + lastKit.headlines.map(function (h, i) {
       return '<div class="headline">' +
         '<span class="h-no">' + (i + 1) + '</span>' +
         '<span class="h-main"><span class="h-type">' + C.escapeHtml(h.type) + ' · ' + h.length + '자</span>' +
@@ -381,35 +394,57 @@
         '</div>';
     }).join('');
 
-    $('#sectionList').innerHTML = lastKit.sections.map(function (s, i) {
-      const open = openSections.has(s.id);
-      return '<div class="section' + (open ? ' is-open' : '') + '" data-section="' + s.id + '">' +
-        '<button class="section-head" type="button" data-action="toggle-section" data-index="' + i + '" aria-expanded="' + (open ? 'true' : 'false') + '">' +
-        '<span class="sc-no">' + s.no + '</span>' +
-        '<span class="sc-title">' + C.escapeHtml(s.title) + '</span>' +
-        '<span class="sc-goal">' + C.escapeHtml(s.goal) + '</span>' +
-        '<span class="sc-chev" aria-hidden="true">▾</span>' +
-        '</button>' +
-        '<div class="section-body"' + (open ? '' : ' hidden') + '>' +
-        '<pre class="section-copy">' + C.escapeHtml(s.copy) + '</pre>' +
-        '<div class="section-actions">' +
-        '<button class="btn btn-ghost" data-action="copy-section" data-index="' + i + '">이 단락 복사</button>' +
-        '</div></div></div>';
-    }).join('');
+    if (pro && pro.blocks.length) {
+      $('#sectionList').innerHTML = pro.blocks.map(function (b, i) {
+        return '<div class="section is-open is-pro" data-section="pro-' + i + '">' +
+          '<div class="section-head">' +
+          '<span class="sc-no">' + (i + 1) + '</span>' +
+          '<span class="sc-title">' + C.escapeHtml(b.heading || b.stepLabel || b.step || '') + '</span>' +
+          '<span class="sc-goal">Pro 단계</span></div>' +
+          '<div class="section-body">' +
+          '<pre class="section-copy">' + C.escapeHtml(proBlockText(b)) + '</pre>' +
+          '<div class="section-actions">' +
+          '<button class="btn btn-ghost" data-action="copy-pro-block" data-index="' + i + '">이 단락 복사</button>' +
+          '</div></div></div>';
+      }).join('');
+    } else {
+      $('#sectionList').innerHTML = lastKit.sections.map(function (s, i) {
+        const open = openSections.has(s.id);
+        return '<div class="section' + (open ? ' is-open' : '') + '" data-section="' + s.id + '">' +
+          '<button class="section-head" type="button" data-action="toggle-section" data-index="' + i + '" aria-expanded="' + (open ? 'true' : 'false') + '">' +
+          '<span class="sc-no">' + s.no + '</span>' +
+          '<span class="sc-title">' + C.escapeHtml(s.title) + '</span>' +
+          '<span class="sc-goal">' + C.escapeHtml(s.goal) + '</span>' +
+          '<span class="sc-chev" aria-hidden="true">▾</span>' +
+          '</button>' +
+          '<div class="section-body"' + (open ? '' : ' hidden') + '>' +
+          '<pre class="section-copy">' + C.escapeHtml(s.copy) + '</pre>' +
+          '<div class="section-actions">' +
+          '<button class="btn btn-ghost" data-action="copy-section" data-index="' + i + '">이 단락 복사</button>' +
+          '</div></div></div>';
+      }).join('');
+    }
 
-    lastFaqList = lastKit.faqs.map(function (f) { return { no: f.no, q: f.q, a: f.a }; })
-      .concat((state.bridge.faqs || []).map(function (f, i) {
-        return { no: lastKit.faqs.length + i + 1, q: f.q, a: f.a, ai: true };
-      }));
+    const proFaqs = pro && Array.isArray(pro.faqs) ? pro.faqs : [];
+    lastFaqList = proFaqs.map(function (f, i) {
+      return { no: i + 1, q: f.q, a: f.a, pro: true };
+    }).concat(lastKit.faqs.map(function (f) {
+      return { no: proFaqs.length + f.no, q: f.q, a: f.a };
+    })).concat((state.bridge.faqs || []).map(function (f, i) {
+      return { no: proFaqs.length + lastKit.faqs.length + i + 1, q: f.q, a: f.a, ai: true };
+    }));
     $('#faqList').innerHTML = lastFaqList.map(function (f, i) {
-      return '<div class="faq' + (f.ai ? ' is-ai' : '') + '">' +
+      return '<div class="faq' + (f.ai ? ' is-ai' : '') + (f.pro ? ' is-pro' : '') + '">' +
         '<div class="faq-q"><b>Q' + f.no + '</b>' +
+        (f.pro ? '<span class="engine-tag">Pro</span>' : '') +
         (f.ai ? '<span class="engine-tag">AI 추가</span>' : '') +
         '<span>' + C.escapeHtml(f.q) + '</span></div>' +
         '<div class="faq-a">' + C.escapeHtml(f.a) + '</div>' +
         '<div class="faq-copy"><button class="btn btn-ghost" data-action="copy-faq" data-index="' + i + '">문답 복사</button></div>' +
         '</div>';
     }).join('');
+
+    renderProPanel();
 
     const bridgePanel = $('#bridgeCopyPanel');
     if (bridgePanel) {
@@ -418,9 +453,191 @@
     }
   }
 
+  /* ── Pro AI 완성 카피 ──────────────────────────────────
+     무료 모드에서는 버튼이 연결 안내만 열고, 아무 요청도 보내지 않는다.
+     연결 뒤에는 buildProPrompt('commerce') → generate → JSON → 7단·FAQ 삽입. */
+
+  const PRO_STEPS = {
+    hook: '① 훅', problem: '② 문제 공감', cause: '③ 원인', solution: '④ 해결(상품)',
+    proof: '⑤ 근거', reversal: '⑥ 망설임 제거', cta: '⑦ 행동',
+  };
+
+  function proBlockText(b) {
+    const lines = [];
+    if (b.body) lines.push(String(b.body).trim());
+    (Array.isArray(b.bullet) ? b.bullet : []).forEach(function (x) {
+      if (String(x || '').trim()) lines.push('· ' + String(x).trim());
+    });
+    return lines.join('\n').trim();
+  }
+
+  function proCopyText(kit) {
+    if (!kit) return '';
+    const out = [];
+    if (kit.headline) out.push(kit.headline);
+    if (kit.subheadline) out.push(kit.subheadline);
+    (kit.blocks || []).forEach(function (b, i) {
+      const label = PRO_STEPS[b.step] || (b.stepLabel || ('단계 ' + (i + 1)));
+      out.push('\n[' + label + '] ' + (b.heading || ''));
+      const body = proBlockText(b);
+      if (body) out.push(body);
+    });
+    if (Array.isArray(kit.specTable) && kit.specTable.length) {
+      out.push('\n[상품 스펙]');
+      kit.specTable.forEach(function (r) { out.push((r.label || '') + ': ' + (r.value || '')); });
+    }
+    if (kit.riskReversal) out.push('\n[교환·환불 안내] ' + kit.riskReversal);
+    if (Array.isArray(kit.faqs) && kit.faqs.length) {
+      out.push('\n[FAQ]');
+      kit.faqs.forEach(function (f) { out.push('Q. ' + f.q + '\nA. ' + f.a); });
+    }
+    return out.join('\n').trim();
+  }
+
+  function renderProPanel() {
+    const panel = $('#proResult');
+    if (!panel) return;
+    const kit = state.pro.kit;
+    panel.hidden = !kit;
+    if (!kit) return;
+    $('#proTitle').textContent = kit.headline || '';
+    const sub = [];
+    if (kit.subheadline) sub.push(kit.subheadline);
+    if (state.pro.meta) sub.push(state.pro.meta);
+    sub.push('7단 카피 · FAQ ' + ((kit.faqs || []).length) + '개');
+    $('#proSub').textContent = sub.join(' · ');
+    $('#proMeta').textContent = state.pro.meta || '';
+  }
+
+  function proInput() {
+    const benefits = state.benefits.map(function (b) { return String(b || '').trim(); }).filter(Boolean);
+    return {
+      product: String(state.name || '').trim(),
+      target: String(state.target || '').trim(),
+      problem: String(state.frames.problem || state.weakness || '').trim(),
+      benefit: benefits.join(' / '),
+      proof: String(state.frames.proof || '').trim(),
+      price: state.margin.price ? Number(state.margin.price).toLocaleString('ko-KR') + '원' : '',
+      objection: String(state.weakness || '').trim(),
+    };
+  }
+
+  function setProBusy(on) {
+    state.pro.busy = !!on;
+    const btn = $('[data-action="pro-generate"]');
+    if (!btn) return;
+    btn.setAttribute('aria-busy', on ? 'true' : 'false');
+    const label = btn.querySelector('.pro-label');
+    if (label) label.textContent = on ? 'Pro AI가 쓰는 중…' : 'Pro AI로 고전환 상세 카피 생성';
+  }
+
+  function updateProUi() {
+    if (!PS) return;
+    const s = PS.sync($('#proBox') || document);
+    const el = $('#proState');
+    if (!el || state.pro.busy) return;
+    el.textContent = s.connected
+      ? s.providerName + ' 연결됨 · 상품 스펙·타겟으로 7단 고전환 카피를 쓰고 7단 표·FAQ에 바로 넣습니다.'
+      : '무료 모드 · 지금 만든 7단 카피와 FAQ를 그대로 씁니다. Pro를 연결하면 상품 스펙 기반 완성 카피가 들어옵니다.';
+  }
+
+  function runPro() {
+    if (!PS || !P) { toast('Pro 연결 엔진을 불러오지 못했어요. 새로고침해 주세요.', 'warn'); return; }
+    if (state.pro.busy) return;
+    const input = proInput();
+    if (!input.product) {
+      toast('상품명을 먼저 입력하세요.', 'warn');
+      $('#productName').focus();
+      return;
+    }
+    if (!PS.connected()) {
+      updateProUi();
+      toast('무료 모드예요. Pro API를 연결하면 완성 카피가 바로 들어옵니다.');
+      PS.openConnect();
+      return;
+    }
+
+    setProBusy(true);
+    const stateEl = $('#proState');
+    if (stateEl) stateEl.textContent = 'Pro AI가 카피를 쓰는 중… (보통 10~40초) 창을 닫지 마세요.';
+
+    PS.run('commerce', input).then(function (res) {
+      setProBusy(false);
+      if (!res.ok) {
+        updateProUi();
+        if (stateEl) stateEl.textContent = res.message;
+        toast(res.message, 'warn');
+        return;
+      }
+      const data = res.data || {};
+      const blocks = (Array.isArray(data.blocks) ? data.blocks : []).map(function (b) {
+        const step = String(b.step || '').trim();
+        return {
+          step: step,
+          stepLabel: PRO_STEPS[step] || step,
+          heading: String(b.heading || '').trim(),
+          body: String(b.body || '').trim(),
+          bullet: (Array.isArray(b.bullet) ? b.bullet : []).map(function (x) { return String(x || '').trim(); }).filter(Boolean),
+        };
+      }).filter(function (b) { return b.heading || b.body || b.bullet.length; });
+      if (!blocks.length) {
+        toast('응답에 7단 카피가 비어 있어요. 다시 시도해 주세요.', 'warn');
+        return;
+      }
+      state.pro.kit = {
+        headline: String(data.headline || '').trim(),
+        subheadline: String(data.subheadline || '').trim(),
+        blocks: blocks,
+        specTable: (Array.isArray(data.specTable) ? data.specTable : []).map(function (r) {
+          return { label: String(r.label || '').trim(), value: String(r.value || '').trim() };
+        }).filter(function (r) { return r.label || r.value; }),
+        riskReversal: String(data.riskReversal || '').trim(),
+        faqs: (Array.isArray(data.faq) ? data.faq : []).map(function (f) {
+          return { q: String(f.q || '').trim(), a: String(f.a || '').trim() };
+        }).filter(function (f) { return f.q && f.a; }),
+      };
+      state.pro.meta = PS.describe(res);
+      state.pro.at = new Date().toISOString();
+      openSections.clear();
+      renderKit();
+      updateProUi();
+      if (stateEl) stateEl.textContent = (res.meta && res.meta.provider ? res.meta.provider + ' ' : '') + '완성 카피를 7단·FAQ에 넣었습니다. 전체 복사에도 함께 담깁니다.';
+      toast('Pro 완성 카피 ' + blocks.length + '단을 넣었어요.', 'ok');
+    });
+  }
+
+  function clearProKit() {
+    if (!state.pro.kit) return;
+    state.pro.kit = null;
+    state.pro.meta = '';
+    renderKit();
+    toast('무료 엔진 결과로 되돌렸어요.');
+  }
+
+  /* 연결 버튼·모달은 처음 눌렀을 때 만든다.
+     시작하자마자 만들면 쓰지 않는 화면(제공자 키 안내 링크)이 DOM에 남는다. */
+  function hookProConnect() {
+    const btn = $('#proConnect');
+    if (!btn || btn.getAttribute('data-pro-hooked') === '1') return;
+    btn.setAttribute('data-pro-hooked', '1');
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (P && typeof P.mountModal === 'function') P.mountModal(btn);
+      PS.openConnect();
+    });
+  }
+
+  function initPro() {
+    if (!PS) return;
+    PS.badge('#proBadge');
+    hookProConnect();
+    PS.onConnectChange(function () { updateProUi(); });
+    updateProUi();
+  }
+
   function composeFullText() {
     if (!lastKit) return '';
-    const parts = [lastKit.fullText];
+    const parts = [state.pro.kit ? proCopyText(state.pro.kit) : lastKit.fullText];
     if (state.bridge.copy) parts.push('\n\n■ AI 다듬은 카피\n' + state.bridge.copy);
     if (state.bridge.faqs.length) {
       parts.push('\n\n■ AI 추가 FAQ\n' + state.bridge.faqs.map(function (f) {
@@ -2167,6 +2384,15 @@
           toast('AI 상품명을 적용했어요 (' + n.total + '점)');
           break;
         }
+        case 'pro-generate': runPro(); break;
+        case 'pro-copy': copyText(proCopyText(state.pro.kit), 'Pro 완성 카피'); break;
+        case 'copy-pro-copy': copyText(state.pro.kit ? proCopyText(state.pro.kit) : '', 'Pro 카피'); break;
+        case 'copy-pro-block': {
+          const pb = state.pro.kit && state.pro.kit.blocks[Number(target.getAttribute('data-index'))];
+          if (pb) copyText(proBlockText(pb), (pb.heading || '단락') + ' 카피');
+          break;
+        }
+        case 'clear-pro-kit': clearProKit(); break;
         case 'copy-bridge-copy': copyText(state.bridge.copy, 'AI 다듬은 카피'); break;
         case 'clear-bridge-copy':
           state.bridge.copy = '';
@@ -2277,6 +2503,7 @@
 
     syncForm();
     bindEvents();
+    initPro();
     renderScore();
     renderMargin();
     renderSaved();
