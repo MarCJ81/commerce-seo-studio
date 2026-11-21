@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>커머스 SEO 스튜디오 — 상품명 채점 · 카피 심리학 · 핀터레스트 디자인 · 마진 ROAS</title>
+<meta name="description" content="스마트스토어·쿠팡 상품명을 100점으로 채점하고, 8대 심리 트리거로 상세 카피를 진단하며, 핀터레스트 레퍼런스 3~4안으로 상세페이지를 리디자인합니다. 내 구독 AI 브리지 포함. 서버 없이 브라우저에만 저장됩니다." />
+<meta name="theme-color" content="#ffffff" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="favicon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body data-tab="score">
+<a class="skip-link" href="#main">본문으로 바로가기</a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#" data-action="go-score" aria-label="커머스 SEO 스튜디오 홈">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" width="34" height="34">
+          <defs>
+            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#60a5fa" /><stop offset="1" stop-color="#1d4ed8" />
+            </linearGradient>
+          </defs>
+          <rect x="1" y="1" width="38" height="38" rx="11" fill="url(#brandGrad)" />
+          <path d="M11.5 9.5h11l6 6v4.2" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+          <circle cx="12.4" cy="13.4" r="1.5" fill="#fff" />
+          <path d="M18 21.5h9M18 25h6" stroke="#fff" stroke-opacity=".75" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="25.5" cy="26.5" r="5" fill="none" stroke="#fff" stroke-width="2.1" />
+          <path d="M29.2 30.2l3.3 3.3" stroke="#fff" stroke-width="2.3" stroke-linecap="round" />
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>커머스 SEO 스튜디오</strong>
+        <small>COMMERCE SEO STUDIO</small>
+      </span>
+    </a>
+
+    <nav class="tabs" role="tablist" aria-label="주요 화면">
+      <button class="tab is-active" role="tab" aria-selected="true" data-tab="score" aria-controls="view-score">상품명 채점</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="copy" aria-controls="view-copy">상세 카피 · FAQ</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="design" aria-controls="view-design">디자인</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="compet" aria-controls="view-compet">경쟁강도</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="bridge" aria-controls="view-bridge">AI 브리지</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="margin" aria-controls="view-margin">마진 · ROAS</button>
+      <button class="tab" role="tab" aria-selected="false" data-tab="saved" aria-controls="view-saved">작업 저장함<span class="tab-count" id="savedCount" hidden>0</span></button>
+    </nav>
+
+    <div class="top-actions">
+      <button type="button" class="icon-btn" data-action="toggle-theme" aria-label="다크 모드로 전환" title="라이트/다크">
+        <svg class="ico-sun" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><circle cx="10" cy="10" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M10 1.6v2M10 16.4v2M1.6 10h2M16.4 10h2M4.1 4.1l1.4 1.4M14.5 14.5l1.4 1.4M15.9 4.1l-1.4 1.4M5.5 14.5l-1.4 1.4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        <svg class="ico-moon" viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M16.5 12.4A7 7 0 0 1 7.6 3.5a7 7 0 1 0 8.9 8.9z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="btn btn-primary" data-action="open-save">
+        <svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M5 3.5h8l3 3v10H5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M8 3.5h5v4H8zM8 12h5" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span class="save-label">저장</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="productbar">
+  <div class="productbar-inner">
+    <div class="seg" id="platformSeg" role="group" aria-label="플랫폼 선택">
+      <button type="button" data-platform="smartstore" class="is-on" aria-pressed="true">스마트스토어</button>
+      <button type="button" data-platform="coupang" aria-pressed="false">쿠팡</button>
+    </div>
+
+    <label class="pb-field pb-name">
+      <span>상품명</span>
+      <input id="productName" type="text" autocomplete="off" spellcheck="false" placeholder="예: 모아 무선 핸디 청소기 M2 15000Pa" />
+    </label>
+
+    <label class="pb-field pb-kw">
+      <span>목표 키워드</span>
+      <input id="productKeyword" type="text" autocomplete="off" spellcheck="false" placeholder="예: 무선 청소기 (쉼표로 여러 개)" />
+    </label>
+
+    <button type="button" class="score-chip" id="scoreChip" data-action="go-score" aria-label="상품명 점수 자세히 보기">
+      <b id="chipScore">0</b><span>/100</span>
+      <em id="chipGrade">대기</em>
+    </button>
+  </div>
+</div>
+
+<main id="main" tabindex="-1">
+
+  <!-- ── 1. 상품명 채점 ─────────────────────────────── -->
+  <section class="view" id="view-score" role="tabpanel" aria-label="상품명 SEO 채점">
+    <div class="view-head">
+      <div class="view-title">
+        <h1>상품명 SEO 채점</h1>
+        <p class="sub">입력하는 순간 점수가 바뀝니다. 길이·키워드 위치·단어 중복·특수문자·금지 표현 다섯 가지로 봅니다.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="load-sample" data-sample="sample-before">개선 전 예시</button>
+        <button class="btn btn-ghost btn-sm" data-action="load-sample" data-sample="sample-after">개선 후 예시</button>
+        <button class="btn btn-ghost btn-sm danger" data-action="clear-product">비우기</button>
+      </div>
+    </div>
+
+    <div class="score-grid">
+      <div class="col">
+        <div class="panel score-panel">
+          <div class="score-head">
+            <div class="ring" id="scoreRing" style="--p:0">
+              <div class="ring-in"><b id="scoreTotal">0</b><span>/ 100</span></div>
+            </div>
+            <div class="score-meta">
+              <span class="badge grade c" id="scoreGrade">C</span>
+              <strong id="scoreLabel">상품명을 입력하세요</strong>
+              <span class="muted" id="scoreSub">상품명과 목표 키워드를 넣으면 바로 채점합니다</span>
+            </div>
+          </div>
+          <div class="counters" id="metricChips"></div>
+          <div class="parts" id="scoreParts"></div>
+        </div>
+
+        <div class="panel issues-panel">
+          <div class="panel-head"><h2>진단 항목</h2><span class="muted" id="issueCount">0</span></div>
+          <div id="issueList" class="issue-list"></div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="panel">
+          <div class="panel-head"><h2>상품명 미리보기</h2><span class="muted">표시된 부분부터 고치세요</span></div>
+          <div class="name-preview" id="namePreview"><span class="muted">상품명을 입력하면 문제 구간을 표시합니다.</span></div>
+          <div class="preview-legend">
+            <span><i class="lg claim"></i>금지·과장</span>
+            <span><i class="lg policy"></i>정책 위반</span>
+            <span><i class="lg symbol"></i>기호</span>
+            <span><i class="lg dup"></i>중복</span>
+          </div>
+          <div class="kw-check" id="keywordCheck"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>이렇게 바꾸면</h2><span class="muted" id="suggestHint">금지어·중복·기호를 걷어낸 버전</span></div>
+          <div id="suggestList" class="suggest-list"></div>
+        </div>
+
+        <div class="panel rules-panel">
+          <div class="panel-head"><h2 id="ruleTitle">스마트스토어 규칙</h2><span class="muted" id="ruleSummary"></span></div>
+          <ul class="rule-list" id="ruleList"></ul>
+          <p class="foot-note" id="ruleNote"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. 상세 카피 ──────────────────────────────── -->
+  <section class="view" id="view-copy" role="tabpanel" aria-label="상세페이지 카피와 FAQ" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>상세페이지 7단 카피 &amp; FAQ</h1>
+        <p class="sub">장점 3개만 넣으면 후킹 헤드라인 5종, 7단 설득 카피, 예상 FAQ 5개가 바로 나옵니다. 한 번에 복사해 쓰세요.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="copy-kit">전체 복사</button>
+        <button class="btn btn-ghost btn-sm" data-action="download-kit">TXT 저장</button>
+      </div>
+    </div>
+
+    <div class="copy-grid">
+      <aside class="panel copy-form">
+        <div class="panel-head"><h2>상품 정보</h2><span class="muted">입력하면 바로 생성</span></div>
+        <p class="current-product" id="copyCurrent">상품명을 먼저 입력하세요</p>
+        <div class="field">
+          <label for="copyTarget">타겟 고객</label>
+          <input id="copyTarget" type="text" placeholder="예: 원룸에 사는 1~2인 가구" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="benefit1">핵심 장점 1</label>
+          <input id="benefit1" type="text" placeholder="예: 가벼운 무게로 한 손 청소" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="benefit2">핵심 장점 2</label>
+          <input id="benefit2" type="text" placeholder="예: 헤파필터로 미세먼지 걸러냄" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="benefit3">핵심 장점 3</label>
+          <input id="benefit3" type="text" placeholder="예: 충전 후 40분 사용" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="copyWeakness">단점·보완점 <span class="field-hint">숨기지 말고 한 줄</span></label>
+          <input id="copyWeakness" type="text" placeholder="예: 소음이 조금 큰 편" autocomplete="off" />
+        </div>
+        <div class="copy-form-actions">
+          <button class="btn btn-primary" data-action="copy-kit">전체 복사</button>
+          <button class="btn btn-ghost" data-action="go-margin">마진 계산</button>
+        </div>
+        <p class="foot-note">카피는 입력한 내용을 조합해 만듭니다. 효능·최상급 표현은 넣지 않았습니다.</p>
+      </aside>
+
+      <div class="copy-out">
+        <div class="panel">
+          <div class="panel-head"><h2>후킹 헤드라인 5종</h2><span class="muted">첫 문장으로 쓰기</span></div>
+          <div id="headlineList" class="headline-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>상세페이지 7단</h2><span class="muted">공감 → 구매 유도</span></div>
+          <div id="sectionList" class="section-list"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>고객 예상 FAQ 5개</h2><span class="muted">문의를 미리 막기</span></div>
+          <div id="faqList" class="faq-list"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="studio-stack">
+      <div class="panel bridge-copy-panel" id="bridgeCopyPanel" hidden>
+        <div class="panel-head"><h2>AI 다듬은 카피 <span class="engine-tag">브리지 결과</span></h2><span class="muted">전체 복사·TXT에 함께 담깁니다</span></div>
+        <pre class="section-copy" id="bridgeCopyText"></pre>
+        <div class="section-actions">
+          <button class="btn btn-ghost" data-action="copy-bridge-copy">복사</button>
+          <button class="btn btn-ghost danger" data-action="clear-bridge-copy">빼기</button>
+        </div>
+      </div>
+
+      <div class="panel psych-panel">
+        <div class="panel-head">
+          <h2>카피 심리학 진단 <span class="engine-tag">8 트리거</span></h2>
+          <span class="muted" id="psychSource">—</span>
+        </div>
+        <div class="psych-top">
+          <div class="psych-score">
+            <b id="psychTotal">0</b><span>/100</span>
+            <em class="badge grade c" id="psychGrade">—</em>
+          </div>
+          <div class="psych-summary">
+            <strong id="psychTitle">카피를 만들면 바로 진단합니다</strong>
+            <p class="muted" id="psychDesc">상품 정보를 넣으면 8개 심리 트리거 점수와 감점 표현을 함께 계산합니다.</p>
+            <div class="psych-actions">
+              <button class="btn btn-ghost btn-sm" data-action="psych-from-kit">생성 카피 진단</button>
+              <button class="btn btn-ghost btn-sm" data-action="psych-correct">추상어·공급자어 자동 교정</button>
+              <button class="btn btn-ghost btn-sm" data-action="psych-copy">텍스트 복사</button>
+            </div>
+          </div>
+        </div>
+        <div class="trigger-grid" id="triggerGrid"></div>
+        <div class="psych-cols">
+          <div class="psych-col">
+            <h3>먼저 고칠 것 3가지</h3>
+            <div class="rec-list" id="psychRecs"></div>
+          </div>
+          <div class="psych-col">
+            <h3>감점 표현 <span class="friction-badge" id="frictionBadge">0</span></h3>
+            <div class="friction-list" id="frictionList"></div>
+          </div>
+        </div>
+        <details class="psych-editor">
+          <summary>직접 쓴 카피로 진단하기</summary>
+          <textarea id="psychText" class="psych-textarea" placeholder="광고 카피·상세페이지 문장을 붙여넣으면 8트리거 점수와 감점 표현을 바로 진단합니다."></textarea>
+          <p class="foot-note">여기에 붙여넣은 글은 저장하지 않습니다. 탭을 옮겨도 진단은 유지되지만 새로고침하면 사라집니다.</p>
+        </details>
+      </div>
+
+      <div class="panel frame-panel">
+        <div class="panel-head">
+          <h2>4대 프레임워크 변환 <span class="engine-tag">PAS · BAB · AIDA · 4U</span></h2>
+          <span class="muted" id="frameHint"></span>
+        </div>
+        <div class="frame-form">
+          <label class="ff"><span>문제 한 줄</span><input id="frameProblem" type="text" autocomplete="off" placeholder="비우면 단점·타겟에서 만듭니다" /></label>
+          <label class="ff"><span>증거 숫자 <i>선택</i></span><input id="frameProof" type="text" autocomplete="off" placeholder="예: 누적 8,412명, 재구매 68%" /></label>
+          <label class="ff"><span>기한·수량 <i>선택</i></span><input id="frameUrgency" type="text" autocomplete="off" placeholder="예: 금요일 23시 마감" /></label>
+          <label class="ff"><span>CTA</span><input id="frameCta" type="text" autocomplete="off" placeholder="3초 만에 확인하기" /></label>
+        </div>
+        <div class="frame-tabs" id="frameTabs" role="group" aria-label="프레임워크 선택"></div>
+        <div class="frame-compare" id="frameCompare"></div>
+        <div class="frame-out" id="frameOut"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. 상세페이지 디자인 ───────────────────────── -->
+  <section class="view" id="view-design" role="tabpanel" aria-label="상세페이지 디자인 레퍼런스" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>상세페이지 디자인</h1>
+        <p class="sub">상품·타겟 맥락을 분석해 핀터레스트 고전환 레퍼런스 3~4안을 추천합니다. 하나를 고르면 팔레트·서체·여백·실사이미지 배치까지 한 번에 바뀝니다.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="design-refresh">다시 추천</button>
+        <button class="btn btn-ghost btn-sm" data-action="copy-design-css">CSS 복사</button>
+        <button class="btn btn-ghost btn-sm" data-action="copy-design-html">카드 HTML</button>
+      </div>
+    </div>
+
+    <div class="design-grid">
+      <aside class="panel design-side">
+        <div class="panel-head"><h2>상품 맥락</h2><span class="muted" id="designContextTag">자동 분석</span></div>
+        <p class="current-product" id="designContext">상품명을 먼저 입력하세요</p>
+        <div class="field">
+          <label for="designIndustry">업종 <span class="field-hint">비우면 본문에서 추론</span></label>
+          <select id="designIndustry"></select>
+        </div>
+        <div class="field">
+          <label for="designTitle">미리보기 제목</label>
+          <input id="designTitle" type="text" autocomplete="off" placeholder="예: 모아 무선 핸디 청소기 M2" />
+        </div>
+        <div class="field">
+          <label for="designBody">서브 문구</label>
+          <input id="designBody" type="text" autocomplete="off" placeholder="장점 1~2개" />
+        </div>
+        <div class="field-row">
+          <div class="field"><label for="designCta">버튼 문구</label><input id="designCta" type="text" autocomplete="off" placeholder="3초 만에 확인하기" /></div>
+          <div class="field"><label for="designBadge">배지(가격)</label><input id="designBadge" type="text" autocomplete="off" placeholder="59,000원" /></div>
+        </div>
+        <p class="foot-note" style="margin-top:0">구도마다 들어가는 제목 길이가 다릅니다. 넘치면 미리보기에서 단어 단위로 줄이고, 이유를 아래 “이 디자인 규칙”에 적습니다.</p>
+        <div class="panel-head sub-head"><h2>레퍼런스 이미지</h2><span class="muted">색만 추출</span></div>
+        <label class="upload-drop" for="designImage">
+          <input type="file" id="designImage" accept="image/*" hidden />
+          <span class="ud-title">핀터레스트 이미지 올리기</span>
+          <span class="ud-sub">마음에 드는 레퍼런스 1장 → 배경·포인트 색을 뽑아 선택한 구도에 입힙니다.</span>
+        </label>
+        <div class="palette-out" id="paletteOut"></div>
+
+        <div class="panel-head sub-head"><h2>v2 정밀 도구</h2><span class="muted" id="v2Version">엔진 2.0</span></div>
+
+        <div class="v2-block">
+          <div class="v2-step"><b>① 레퍼런스 1클릭 검색</b><span>업종·무드·글자 밀도로 검색어를 만들어 핀터레스트·비핸스를 엽니다.</span></div>
+          <div class="ref-links" id="v2RefLinks"></div>
+          <p class="foot-note" id="v2RefNote"></p>
+        </div>
+
+        <div class="v2-block">
+          <div class="v2-step"><b>② 폰트 믹스 · 종이 질감</b><span>같은 구도에서 AI 티를 걷어내는 두 가지.</span></div>
+          <div class="field-row">
+            <div class="field"><label for="v2FontMix">폰트 믹스</label><select id="v2FontMix"></select></div>
+            <div class="field"><label for="v2Grain">종이 질감</label><select id="v2Grain"></select></div>
+          </div>
+          <p class="mix-note" id="v2MixNote"></p>
+          <div class="density-line" id="v2Density"></div>
+        </div>
+
+        <div class="v2-block">
+          <div class="v2-step"><b>③ 내 브랜드 키트</b><span>색·폰트·질감·구도를 고정해 다음 상품에도 그대로 씁니다.</span></div>
+          <input id="v2KitName" class="kit-name" type="text" maxlength="24" autocomplete="off" placeholder="예: 미니멀 리빙 브랜드" aria-label="브랜드 키트 이름" />
+          <div class="palette-actions">
+            <button type="button" class="btn btn-ghost" data-action="v2-save-kit">현재 카드 고정</button>
+            <button type="button" class="btn btn-ghost" data-action="v2-copy-kit">JSON 복사</button>
+          </div>
+          <div class="kit-list" id="v2KitList"></div>
+          <details class="kit-import">
+            <summary>저장한 키트 JSON 붙여넣기</summary>
+            <textarea id="v2KitJson" rows="3" spellcheck="false" placeholder='{"schema":"designref.brandkit/2", …}'></textarea>
+            <button type="button" class="btn btn-ghost" data-action="v2-import-kit">이 키트 불러오기</button>
+          </details>
+        </div>
+      </aside>
+
+
+      <div class="design-main">
+        <div class="panel">
+          <div class="panel-head"><h2>레퍼런스 3~4안</h2><span class="muted" id="designContextLine"></span></div>
+          <div class="ref-grid" id="refGrid"></div>
+          <p class="foot-note" id="designNote"></p>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h2>상세페이지 카드 미리보기</h2><span class="muted" id="designAppliedName"></span></div>
+          <div class="design-stage" id="designStage"></div>
+        </div>
+        <div class="panel v2-card-panel">
+          <div class="panel-head"><h2>v2 정밀 카드 <span class="engine-tag">폰트 믹스 · 질감 · 브랜드 고정</span></h2><span class="muted" id="v2CardName"></span></div>
+          <div class="v2-stage" id="v2Stage"></div>
+          <div class="v2-meta" id="v2Meta"></div>
+          <div class="warn-list" id="v2Warnings"></div>
+          <div class="copy-form-actions">
+            <button type="button" class="btn btn-ghost" data-action="v2-copy-html">카드 HTML</button>
+            <button type="button" class="btn btn-ghost" data-action="v2-copy-css">카드 CSS</button>
+            <button type="button" class="btn btn-ghost" data-action="v2-reset">프리셋으로 돌아가기</button>
+          </div>
+        </div>
+
+        <div class="panel v2-bp-panel">
+          <div class="panel-head"><h2>레퍼런스 사진 → 90% 설계도 복제</h2><span class="muted" id="v2BpState">사진 1장 → JSON 1개</span></div>
+          <p class="foot-note">마음에 드는 상세페이지 사진을 구독 중인 AI에 첨부하고 아래 프롬프트를 붙여넣으세요. AI가 좌표·색·폰트를 잰 JSON을 주면, 그대로 넣어 같은 구도의 카드를 이 앱에서 다시 그립니다.</p>
+          <div class="bridge-actions v2-bp-actions">
+            <button type="button" class="btn btn-ghost" data-action="v2-copy-vision">해부 프롬프트 복사</button>
+            <button type="button" class="btn btn-ghost btn-ai chatgpt" data-action="v2-open-vision" data-target="chatgpt">ChatGPT</button>
+            <button type="button" class="btn btn-ghost btn-ai claude" data-action="v2-open-vision" data-target="claude">Claude</button>
+            <button type="button" class="btn btn-ghost btn-ai gemini" data-action="v2-open-vision" data-target="gemini">Gemini</button>
+          </div>
+          <label class="field v2-bp-field">
+            <span>AI가 준 블루프린트 JSON <em class="field-hint">설명·코드블록이 섞여도 읽습니다</em></span>
+            <textarea id="v2BlueprintText" rows="6" spellcheck="false" placeholder='{"canvas":{"ratio":"4:5"},"margin":0.06,"title":{…}}'></textarea>
+          </label>
+          <div class="bridge-result-actions">
+            <button type="button" class="btn btn-primary" data-action="v2-render-blueprint">설계도 복제 렌더</button>
+            <button type="button" class="btn btn-ghost" data-action="v2-sample-blueprint">예시 JSON 채우기</button>
+            <button type="button" class="btn btn-ghost" data-action="v2-save-blueprint-kit">브랜드 키트로 저장</button>
+          </div>
+          <div class="v2-meta" id="v2BpMeta"></div>
+          <div class="warn-list" id="v2BpWarnings"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>이 디자인 규칙</h2><span class="muted">팔레트 · 타이포 · 레이아웃 · 실사이미지</span></div>
+          <div class="dna-grid" id="designDna"></div>
+          <ul class="rule-list" id="designChecklist"></ul>
+          <div class="warn-list" id="designWarnings"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4. 연관키워드 경쟁강도 ─────────────────────── -->
+  <section class="view" id="view-compet" role="tabpanel" aria-label="연관키워드 경쟁강도 계산기" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>연관키워드 경쟁강도 1초 계산기</h1>
+        <p class="sub">경쟁강도 = 네이버 쇼핑 등록 상품수 ÷ 월 검색량(PC+모바일). 세 숫자만 넣으면 등급과 추천 순서가 바로 나옵니다. 표를 통째로 붙여넣으면 50개도 한 번에 계산합니다.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="load-compet-sample">예시 6개</button>
+        <button class="btn btn-ghost btn-sm" data-action="copy-compet-csv">표 복사</button>
+        <button class="btn btn-ghost btn-sm" data-action="download-compet-csv">CSV 저장</button>
+      </div>
+    </div>
+
+    <div class="compet-grid">
+      <aside class="panel compet-form">
+        <div class="panel-head"><h2>1초 계산기</h2><span class="muted" id="competTag">즉시 계산</span></div>
+        <label class="field">
+          <span>키워드</span>
+          <input id="compKeyword" type="text" autocomplete="off" spellcheck="false" placeholder="예: 원룸 청소기" />
+        </label>
+        <div class="field-row">
+          <div class="field">
+            <label for="compPc">PC 검색 <span class="field-hint">월</span></label>
+            <input id="compPc" type="text" inputmode="numeric" autocomplete="off" placeholder="3100" />
+          </div>
+          <div class="field">
+            <label for="compMobile">모바일 검색 <span class="field-hint">월</span></label>
+            <input id="compMobile" type="text" inputmode="numeric" autocomplete="off" placeholder="12400" />
+          </div>
+        </div>
+        <label class="field">
+          <span>네이버 쇼핑 등록 상품수</span>
+          <input id="compProducts" type="text" inputmode="numeric" autocomplete="off" placeholder="9800" />
+        </label>
+        <div class="compet-result" id="competResult"></div>
+        <div class="copy-form-actions">
+          <button class="btn btn-primary" data-action="compet-add">목록에 추가</button>
+          <button class="btn btn-ghost" data-action="compet-use">목표 키워드로</button>
+        </div>
+        <p class="foot-note" id="competNote"></p>
+      </aside>
+
+      <div class="compet-main">
+        <div class="panel">
+          <div class="panel-head"><h2>일괄 계산</h2><span class="muted">표 붙여넣기 · CSV 파일</span></div>
+          <div class="field-row comp-format-row">
+            <label class="field">
+              <span>열 순서</span>
+              <select id="compFormat">
+                <option value="auto" selected>자동 (4열 우선)</option>
+                <option value="4">키워드 · PC · 모바일 · 상품수</option>
+                <option value="3">키워드 · 총검색 · 상품수</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>CSV 파일 <em class="field-hint">선택</em></span>
+              <input id="compFile" type="file" accept=".csv,.tsv,.txt,text/csv" />
+            </label>
+          </div>
+          <label class="field">
+            <span>표 붙여넣기 <em class="field-hint">엑셀·키워드툴에서 그대로 Ctrl+V</em></span>
+            <textarea id="compBulk" rows="5" spellcheck="false" placeholder="키워드,PC검색,모바일검색,상품수&#10;원룸 청소기,3100,12400,9800&#10;캠핑 청소기,1800,6200,540"></textarea>
+          </label>
+          <div class="bridge-result-actions">
+            <button class="btn btn-primary" data-action="compet-calc">계산</button>
+            <button class="btn btn-ghost" data-action="compet-clear">표 비우기</button>
+          </div>
+          <div class="parse-status" id="compParseStatus"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>추천 정렬</h2><span class="muted" id="competSummary"></span></div>
+          <div class="chip-row sort-chips" id="competSort" role="group" aria-label="정렬 기준"></div>
+          <div class="compet-best" id="competBest"></div>
+          <div class="table-scroll">
+            <table class="sim-table compet-table">
+              <thead>
+                <tr><th>#</th><th>키워드</th><th>월검색</th><th>상품수</th><th>경쟁강도</th><th>등급</th><th>추천</th><th>판정</th><th></th></tr>
+              </thead>
+              <tbody id="competRows"></tbody>
+            </table>
+          </div>
+          <div class="empty" id="competEmpty">
+            <p><strong>아직 계산한 키워드가 없습니다.</strong></p>
+            <p class="muted">왼쪽에 세 숫자를 넣거나, 표를 붙여넣고 <b>계산</b>을 누르세요.</p>
+            <button class="btn btn-ghost" data-action="load-compet-sample">예시 6개로 시작하기</button>
+          </div>
+          <p class="foot-note" id="competFoot"></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5. 내 구독 AI 브리지 ───────────────────────── -->
+  <section class="view" id="view-bridge" role="tabpanel" aria-label="내 구독 AI 원클릭 브리지" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>내 구독 AI 브리지</h1>
+        <p class="sub">API 추가 결제 없이, 이미 구독 중인 ChatGPT·Claude·Gemini에 이 앱이 만든 프롬프트를 그대로 넣고 결과만 붙여넣으세요. 프롬프트는 자동 복사되고 새 창이 열립니다.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="copy-prompt">프롬프트 복사</button>
+        <button class="btn btn-ghost btn-sm" data-action="go-copy">카피 탭으로</button>
+      </div>
+    </div>
+
+    <div class="bridge-grid">
+      <div class="panel">
+        <div class="panel-head"><h2>1. 시킬 일</h2><span class="muted" id="promptChars">0자</span></div>
+        <div class="chip-row" id="bridgeTasks"></div>
+        <div class="prompt-box">
+          <div class="prompt-head"><strong id="promptTitle">—</strong></div>
+          <pre class="prompt-text" id="promptText"></pre>
+        </div>
+        <div class="bridge-actions" id="bridgeActions"></div>
+        <p class="foot-note">새 창이 차단되면 프롬프트는 이미 복사되어 있으니 구독 중인 앱을 직접 열어 붙여넣으세요. 이 앱은 어떤 로그인 정보도 보지 않습니다.</p>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head"><h2>2. 결과 붙여넣기</h2><span class="muted" id="bridgeApplyHint"></span></div>
+        <textarea id="bridgeResult" class="bridge-textarea" placeholder="AI가 준 답변을 그대로 붙여넣으세요. 형식이 조금 달라도 읽어서 적용합니다."></textarea>
+        <div class="bridge-result-actions">
+          <button class="btn btn-primary" data-action="apply-bridge">결과 적용</button>
+          <button class="btn btn-ghost" data-action="clear-bridge">지우기</button>
+        </div>
+        <div class="bridge-applied" id="bridgeApplied"></div>
+
+        <details class="gemini-api">
+          <summary>선택: 무료 Gemini API 키로 바로 실행</summary>
+          <p class="foot-note">키가 있으면 새 창 없이 이 화면에서 결과를 받습니다. 키는 이 브라우저(localStorage)에만 저장되고, 실행할 때만 Google 엔드포인트로 보냅니다. 무료 등급은 분당 요청 수 제한이 있습니다.</p>
+          <div class="field-row api-row">
+            <input id="geminiKey" type="password" autocomplete="off" spellcheck="false" placeholder="API 키 (AIza…)" aria-label="Gemini API 키" />
+            <button class="btn btn-ghost" data-action="save-gemini-key">키 저장</button>
+            <button class="btn btn-ghost danger" data-action="clear-gemini-key">삭제</button>
+          </div>
+          <div class="field-row api-row">
+            <select id="geminiModel" aria-label="Gemini 모델">
+              <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+              <option value="gemini-2.0-flash">gemini-2.0-flash</option>
+            </select>
+            <button class="btn btn-primary" data-action="run-gemini">Gemini API로 실행</button>
+          </div>
+          <p class="foot-note" id="geminiNote">키를 저장하지 않았습니다.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 6. 마진 · ROAS ────────────────────────────── -->
+  <section class="view" id="view-margin" role="tabpanel" aria-label="셀러 마진과 광고 손익" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>셀러 마진 &amp; 광고 손익</h1>
+        <p class="sub">1건 팔 때 남는 돈과, 광고비를 얼마까지 쓸 수 있는지(손익분기 ROAS)를 계산합니다. 가격을 바꿔 보세요.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-ghost btn-sm" data-action="load-margin-sample">예시 값</button>
+        <button class="btn btn-ghost btn-sm danger" data-action="clear-margin">비우기</button>
+      </div>
+    </div>
+
+    <div class="margin-grid">
+      <aside class="panel margin-form">
+        <div class="panel-head"><h2>원가·비용</h2><span class="muted">원 단위</span></div>
+        <div class="field">
+          <label for="mPrice">판매가</label>
+          <input id="mPrice" type="number" inputmode="numeric" min="0" step="100" placeholder="59000" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="mCost">원가</label>
+            <input id="mCost" type="number" inputmode="numeric" min="0" step="100" placeholder="24000" />
+          </div>
+          <div class="field">
+            <label for="mShipping">내가 내는 배송비</label>
+            <input id="mShipping" type="number" inputmode="numeric" min="0" step="100" placeholder="3000" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="mFee">마켓 수수료 (%)</label>
+          <input id="mFee" type="number" inputmode="decimal" min="0" max="50" step="0.1" placeholder="10" />
+          <div class="chip-row" id="feePresets"></div>
+        </div>
+        <div class="field">
+          <label for="mAd">판매 1건당 광고비</label>
+          <input id="mAd" type="number" inputmode="numeric" min="0" step="100" placeholder="9000" />
+        </div>
+        <p class="foot-note" id="marginNote">수수료율은 판매자센터에 표시된 내 카테고리 실제 요율을 넣으세요.</p>
+      </aside>
+
+      <div class="margin-out">
+        <div class="verdict" id="verdict">
+          <div>
+            <span class="verdict-label">1건 판매 기준</span>
+            <strong id="verdictTitle">값을 입력하세요</strong>
+            <p id="verdictSub">판매가와 원가를 넣으면 순이익이 계산됩니다.</p>
+          </div>
+          <div class="verdict-net"><span>순이익</span><b id="verdictNet">—</b></div>
+        </div>
+
+        <div class="metric-grid" id="marginMetrics"></div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>광고 ROAS 손익분기</h2><span class="muted" id="roasHint"></span></div>
+          <div class="roas-gauge" id="roasGauge">
+            <div class="roas-legend"><span>현재 ROAS</span><b id="curRoas">—</b></div>
+            <div class="roas-track"><i id="roasBar"></i><span class="roas-mark" id="roasMark" hidden aria-hidden="true"></span></div>
+            <div class="roas-legend"><span>손익분기 ROAS</span><b id="bepRoas">—</b></div>
+          </div>
+          <p class="roas-note" id="roasNote"></p>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head"><h2>가격 시뮬레이션</h2><span class="muted">±20% · 같은 원가·수수료·광고비</span></div>
+          <div class="table-scroll">
+            <table class="sim-table" id="simTable">
+              <thead>
+                <tr><th>판매가</th><th>수수료</th><th>순이익</th><th>마진율</th><th>BEP ROAS</th></tr>
+              </thead>
+              <tbody id="simBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7. 작업 저장함 ────────────────────────────── -->
+  <section class="view" id="view-saved" role="tabpanel" aria-label="작업 저장함" hidden>
+    <div class="view-head">
+      <div class="view-title">
+        <h1>작업 저장함</h1>
+        <p class="sub">상품별 점수·마진·메모를 한 곳에. 열어서 이어 작업하고 CSV·JSON으로 내보냅니다.</p>
+      </div>
+      <div class="view-actions">
+        <button class="btn btn-primary btn-sm" data-action="open-save">현재 상품 저장</button>
+        <button class="btn btn-ghost btn-sm" data-action="export-csv">CSV</button>
+        <button class="btn btn-ghost btn-sm" data-action="export-json">JSON</button>
+        <button class="btn btn-ghost btn-sm" data-action="import-json">가져오기</button>
+      </div>
+    </div>
+
+    <div class="panel toolbar">
+      <div class="chip-row" id="savedChips" role="group" aria-label="상태 필터"></div>
+      <label class="sort" for="savedSort"><span>정렬</span>
+        <select id="savedSort">
+          <option value="recent">최근 저장</option>
+          <option value="score">점수 높은 순</option>
+          <option value="profit">순이익 높은 순</option>
+          <option value="name">상품명 가나다</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="panel table-panel">
+      <div class="saved-table" id="savedTable">
+        <div class="saved-row saved-head">
+          <span>상품</span><span>플랫폼</span><span class="num">점수</span><span class="num">순이익</span><span class="num">마진율</span><span>상태</span><span class="num">저장일</span><span class="right">관리</span>
+        </div>
+        <div id="savedRows"></div>
+      </div>
+      <div class="empty" id="savedEmpty">
+        <p><strong>아직 저장한 상품이 없습니다.</strong></p>
+        <p class="muted">위 입력칸에 상품명을 넣고 <b>저장</b>을 누르면 여기로 들어옵니다.</p>
+        <button class="btn btn-ghost" data-action="load-sample" data-sample="sample-before">예시로 시작하기</button>
+      </div>
+      <div class="table-foot">
+        <span id="savedFoot">0개</span>
+        <span class="muted">저장한 작업은 이 브라우저에만 남습니다.</span>
+      </div>
+    </div>
+    <input type="file" id="importFile" accept=".json,application/json" hidden />
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <p><strong>커머스 SEO 스튜디오</strong> · 서버 없음 · 로그인 없음 · 외부 트래커 0건 · 입력한 상품 정보는 이 브라우저(localStorage)에만 저장됩니다.</p>
+    <p class="muted">카피 진단·디자인 레퍼런스는 이 폴더의 엔진(engines/)이 브라우저에서 계산합니다. AI 브리지는 버튼을 누를 때만 해당 사이트를 열고, 프롬프트 복사·붙여넣기 외에 아무것도 보내지 않습니다. 점수는 공식 채점표가 아닌 참고 지표이며, 수수료·정책은 판매자센터에서 최종 확인하세요.</p>
+    <p class="muted"><a href="privacy.html">개인정보 처리방침</a></p>
+  </div>
+</footer>
+
+<div class="modal-root" id="modalRoot" hidden></div>
+<div class="toast-root" id="toastRoot" aria-live="polite"></div>
+
+<script src="engines/copy-psych-engine.js"></script>
+<script src="engines/design-ref-engine.js"></script>
+<script src="core.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
