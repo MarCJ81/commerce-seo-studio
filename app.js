@@ -269,10 +269,10 @@
   }
 
   function gradeRingColor(grade) {
-    if (grade === 'S') return '#16a34a';
-    if (grade === 'A') return '#1d4ed8';
-    if (grade === 'B') return '#d97706';
-    return '#d92d20';
+    if (grade === 'S') return '#0b7a55';
+    if (grade === 'A') return '#2f5bff';
+    if (grade === 'B') return '#b45309';
+    return '#b42318';
   }
 
   function renderScore() {
@@ -306,6 +306,21 @@
     chips.push('<span class="' + (a.metrics.claimCount ? 'bad' : 'ok') + '">금지어 <b>' + a.metrics.claimCount + '</b>건</span>');
     chips.push('<span class="' + (a.metrics.specCount ? 'ok' : 'warn') + '">규격 <b>' + a.metrics.specCount + '</b>개</span>');
     $('#metricChips').innerHTML = chips.join('');
+
+    // 히어로 벤토 스트립(라이브 지표)
+    const statScore = $('#statScore');
+    if (statScore) statScore.textContent = a.total;
+    const statGrade = $('#statGrade');
+    if (statGrade) statGrade.textContent = state.name ? a.grade + '등급' : '대기';
+    const statLength = $('#statLength');
+    if (statLength) statLength.textContent = a.metrics.length;
+    const statIssues = $('#statIssues');
+    if (statIssues) statIssues.textContent = a.issues.length;
+    const statNote = $('#statNote');
+    if (statNote) {
+      statNote.textContent = !state.name ? '상품명을 넣으면 즉시 갱신'
+        : a.issues.length === 0 ? '진단 항목 모두 통과' : '아래 진단 항목부터 고치세요';
+    }
 
     $('#scoreParts').innerHTML = a.parts.map(function (p) {
       const ratio = p.max ? p.score / p.max : 0;
@@ -2454,7 +2469,7 @@
     const now = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', now);
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', now === 'dark' ? '#070a12' : '#ffffff');
+    if (meta) meta.setAttribute('content', now === 'dark' ? '#0a0b0d' : '#ffffff');
     writeJSON(LS.theme, now);
   }
 

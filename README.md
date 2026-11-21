@@ -5,6 +5,13 @@
 
 **Pro AI 연결(선택)** — 헤더의 `무료 모드 · API 연결` 배지에서 OpenAI·Gemini·Claude·자체 서버를 연결하면, 상세 카피 탭의 **✨ Pro AI로 고전환 상세 카피 생성**이 상품 스펙·타겟으로 7단 카피와 FAQ를 써서 바로 넣습니다. 연결하지 않으면 기존 무료 엔진 카피가 그대로 나옵니다. 키는 기본 `sessionStorage`, 연결 해제 시 삭제. 엔진: `engines/pro-api-connector.js` · `engines/pro-studio.js`
 
+## 디자인 시스템 (A안 · Crisp Bento)
+
+- 순백 `#FFFFFF` 카드 · 배경 `#FAFAFA` · 1px `#E7E8EA` 라인 · 16px 라운드
+- 잉크 `#0C0D0F`, 코발트 `#2F5BFF` 단일 액센트, 산세리프 800 헤드라인
+- 본문·보조 텍스트 대비 4.5:1 이상(WCAG AA) — 라이트·다크 모두
+- 모든 토큰은 `styles.css` 상단 `:root` / `[data-theme="dark"]`에 있습니다.
+
 ## 기능
 
 1. **상품명 SEO 채점 (0~100)** — 길이, 핵심 키워드 앞배치, 단어 중복, 특수문자·이모지, 금지·감점 표현 다섯 항목.

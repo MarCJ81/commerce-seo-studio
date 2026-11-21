@@ -17,18 +17,12 @@
   <div class="topbar-inner">
     <a class="brand" href="#" data-action="go-score" aria-label="커머스 SEO 스튜디오 홈">
       <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 40 40" width="34" height="34">
-          <defs>
-            <linearGradient id="brandGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#60a5fa" /><stop offset="1" stop-color="#1d4ed8" />
-            </linearGradient>
-          </defs>
-          <rect x="1" y="1" width="38" height="38" rx="11" fill="url(#brandGrad)" />
-          <path d="M11.5 9.5h11l6 6v4.2" fill="none" stroke="#fff" stroke-opacity=".9" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="12.4" cy="13.4" r="1.5" fill="#fff" />
-          <path d="M18 21.5h9M18 25h6" stroke="#fff" stroke-opacity=".75" stroke-width="1.8" stroke-linecap="round" />
-          <circle cx="25.5" cy="26.5" r="5" fill="none" stroke="#fff" stroke-width="2.1" />
-          <path d="M29.2 30.2l3.3 3.3" stroke="#fff" stroke-width="2.3" stroke-linecap="round" />
+        <svg viewBox="0 0 40 40" width="30" height="30">
+          <rect x="0" y="0" width="40" height="40" rx="9" fill="#0C0D0F" />
+          <path d="M13 11.5h9.5l4.8 4.8v3.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M13 19.5h8M13 24h5.5" stroke="#fff" stroke-opacity=".72" stroke-width="2" stroke-linecap="round" />
+          <circle cx="26" cy="26" r="4.6" fill="none" stroke="#2F5BFF" stroke-width="2.4" />
+          <path d="M29.4 29.4l3 3" stroke="#2F5BFF" stroke-width="2.6" stroke-linecap="round" />
         </svg>
       </span>
       <span class="brand-text">
@@ -90,14 +84,40 @@
   <!-- ── 1. 상품명 채점 ─────────────────────────────── -->
   <section class="view" id="view-score" role="tabpanel" aria-label="상품명 SEO 채점">
     <div class="view-head">
-      <div class="view-title">
-        <h1>상품명 SEO 채점</h1>
-        <p class="sub">입력하는 순간 점수가 바뀝니다. 길이·키워드 위치·단어 중복·특수문자·금지 표현 다섯 가지로 봅니다.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>01</b> 스마트스토어 · 쿠팡 상품명 채점</span>
+        <h1>상품명 하나로 <em>검색 노출</em>이 갈립니다.</h1>
+        <p class="sub">길이·키워드 위치·단어 중복·특수문자·금지 표현, 다섯 가지로 봅니다. 입력하는 순간 점수와 고칠 곳이 함께 나옵니다.</p>
+        <div class="trust"><span><i>✓</i>서버 전송 0건</span><span><i>✓</i>로그인 없음</span><span><i>✓</i>입력값은 이 브라우저에만</span></div>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="load-sample" data-sample="sample-before">개선 전 예시</button>
         <button class="btn btn-ghost btn-sm" data-action="load-sample" data-sample="sample-after">개선 후 예시</button>
         <button class="btn btn-ghost btn-sm danger" data-action="clear-product">비우기</button>
+      </div>
+    </div>
+
+    <div class="bento-stats" aria-label="현재 채점 요약">
+      <div class="stat ink">
+        <p>현재 점수</p>
+        <b><span id="statScore">0</span><small>/100</small></b>
+        <span class="delta" id="statGrade">대기</span>
+      </div>
+      <div class="stat">
+        <p>상품명 길이</p>
+        <b><span id="statLength">0</span><small>자</small></b>
+        <span class="delta">스마트스토어 50자 권장</span>
+      </div>
+      <div class="stat">
+        <p>진단 항목</p>
+        <b><span id="statIssues">0</span><small>건</small></b>
+        <span class="delta" id="statNote">상품명을 넣으면 즉시 갱신</span>
+      </div>
+      <div class="stat">
+        <p>서버 전송</p>
+        <b>0<small>건</small></b>
+        <span class="delta">모든 계산은 이 브라우저에서</span>
       </div>
     </div>
 
@@ -154,10 +174,12 @@
   <!-- ── 2. 상세 카피 ──────────────────────────────── -->
   <section class="view" id="view-copy" role="tabpanel" aria-label="상세페이지 카피와 FAQ" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>상세페이지 7단 카피 &amp; FAQ</h1>
-        <p class="sub">장점 3개만 넣으면 후킹 헤드라인 5종, 7단 설득 카피, 예상 FAQ 5개가 바로 나옵니다. 한 번에 복사해 쓰세요.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>02</b> 상세 카피 · FAQ</span>
+        <h1>장점 3개면 <em>7단 카피</em>까지 나옵니다.</h1>
+        <p class="sub">후킹 헤드라인 5종, 7단 설득 카피, 예상 FAQ 5개를 한 번에 만듭니다. 그대로 복사해 상세페이지에 붙이세요.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="copy-kit">전체 복사</button>
         <button class="btn btn-ghost btn-sm" data-action="download-kit">TXT 저장</button>
@@ -302,10 +324,12 @@
   <!-- ── 3. 상세페이지 디자인 ───────────────────────── -->
   <section class="view" id="view-design" role="tabpanel" aria-label="상세페이지 디자인 레퍼런스" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>상세페이지 디자인</h1>
-        <p class="sub">상품·타겟 맥락을 분석해 핀터레스트 고전환 레퍼런스 3~4안을 추천합니다. 하나를 고르면 팔레트·서체·여백·실사이미지 배치까지 한 번에 바뀝니다.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>03</b> 디자인 레퍼런스</span>
+        <h1>레퍼런스에서 <em>구도</em>를 가져옵니다.</h1>
+        <p class="sub">상품·타겟 맥락을 읽고 핀터레스트 고전환 레퍼런스 3~4안을 추천합니다. 하나를 고르면 팔레트·서체·여백·이미지 배치까지 바뀝니다.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="design-refresh">다시 추천</button>
         <button class="btn btn-ghost btn-sm" data-action="copy-design-css">CSS 복사</button>
@@ -434,10 +458,12 @@
   <!-- ── 4. 연관키워드 경쟁강도 ─────────────────────── -->
   <section class="view" id="view-compet" role="tabpanel" aria-label="연관키워드 경쟁강도 계산기" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>연관키워드 경쟁강도 1초 계산기</h1>
-        <p class="sub">경쟁강도 = 네이버 쇼핑 등록 상품수 ÷ 월 검색량(PC+모바일). 세 숫자만 넣으면 등급과 추천 순서가 바로 나옵니다. 표를 통째로 붙여넣으면 50개도 한 번에 계산합니다.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>04</b> 연관키워드 경쟁강도</span>
+        <h1>1초면 <em>경쟁강도</em>가 보입니다.</h1>
+        <p class="sub">경쟁강도 = 네이버 쇼핑 등록 상품수 ÷ 월 검색량(PC+모바일). 세 숫자만 넣으면 등급과 추천 순서가 바로 나옵니다.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="load-compet-sample">예시 6개</button>
         <button class="btn btn-ghost btn-sm" data-action="copy-compet-csv">표 복사</button>
@@ -528,10 +554,12 @@
   <!-- ── 5. 내 구독 AI 브리지 ───────────────────────── -->
   <section class="view" id="view-bridge" role="tabpanel" aria-label="내 구독 AI 원클릭 브리지" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>내 구독 AI 브리지</h1>
-        <p class="sub">API 추가 결제 없이, 이미 구독 중인 ChatGPT·Claude·Gemini에 이 앱이 만든 프롬프트를 그대로 넣고 결과만 붙여넣으세요. 프롬프트는 자동 복사되고 새 창이 열립니다.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>05</b> 내 구독 AI 브리지</span>
+        <h1>이미 쓰는 AI를 <em>그대로</em> 씁니다.</h1>
+        <p class="sub">API 추가 결제 없이 ChatGPT·Claude·Gemini에 이 앱이 만든 프롬프트를 넣고, 결과만 붙여넣으세요. 프롬프트는 자동 복사됩니다.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="copy-prompt">프롬프트 복사</button>
         <button class="btn btn-ghost btn-sm" data-action="go-copy">카피 탭으로</button>
@@ -583,10 +611,12 @@
   <!-- ── 6. 마진 · ROAS ────────────────────────────── -->
   <section class="view" id="view-margin" role="tabpanel" aria-label="셀러 마진과 광고 손익" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>셀러 마진 &amp; 광고 손익</h1>
-        <p class="sub">1건 팔 때 남는 돈과, 광고비를 얼마까지 쓸 수 있는지(손익분기 ROAS)를 계산합니다. 가격을 바꿔 보세요.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>06</b> 마진 · ROAS</span>
+        <h1>팔수록 남는 돈, <em>ROAS</em>까지.</h1>
+        <p class="sub">1건 팔 때 남는 돈과 광고비를 얼마까지 쓸 수 있는지(손익분기 ROAS)를 계산합니다. 가격을 바꿔 보세요.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-ghost btn-sm" data-action="load-margin-sample">예시 값</button>
         <button class="btn btn-ghost btn-sm danger" data-action="clear-margin">비우기</button>
@@ -662,10 +692,12 @@
   <!-- ── 7. 작업 저장함 ────────────────────────────── -->
   <section class="view" id="view-saved" role="tabpanel" aria-label="작업 저장함" hidden>
     <div class="view-head">
-      <div class="view-title">
-        <h1>작업 저장함</h1>
-        <p class="sub">상품별 점수·마진·메모를 한 곳에. 열어서 이어 작업하고 CSV·JSON으로 내보냅니다.</p>
+            <div class="view-title">
+        <span class="eyebrow"><b>07</b> 작업 저장함</span>
+        <h1>작업은 <em>한 곳</em>에 쌓입니다.</h1>
+        <p class="sub">상품별 점수·마진·메모를 모아 두고 이어서 작업합니다. CSV·JSON으로 내보내고 다시 가져올 수 있습니다.</p>
       </div>
+
       <div class="view-actions">
         <button class="btn btn-primary btn-sm" data-action="open-save">현재 상품 저장</button>
         <button class="btn btn-ghost btn-sm" data-action="export-csv">CSV</button>
