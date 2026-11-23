@@ -11,7 +11,18 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const VERSION = '1.0.0';
+  const VERSION = '1.1.0';
+
+  /* 한국어 어절·조사 정밀 분석 엔진(engines/korean-text.js). */
+  function loadKoreanText() {
+    const g = typeof self !== 'undefined' ? self : (typeof globalThis !== 'undefined' ? globalThis : {});
+    if (g && g.KoreanText) return g.KoreanText;
+    if (typeof require === 'function') {
+      try { return require('./engines/korean-text.js'); } catch (e) { /* noop */ }
+    }
+    return null;
+  }
+  const KT = loadKoreanText();
 
   /* ── 플랫폼 규칙 ──────────────────────────────────────────
      근거: 네이버 쇼핑 상품검색 SEO 가이드(스마트스토어 상품명 100자 입력,
@@ -331,11 +342,32 @@
     const m = re.exec(name);
     const tokens = tokenize(name).map(function (t) { return t.text; });
     const kwTokens = tokenize(kw).map(function (t) { return t.text; });
-    const found = kwTokens.filter(function (t) { return tokens.indexOf(t) >= 0; }).length;
+    /* 같거나, 더 긴 복합어 안에 들어 있으면 그 단어를 쓴 것으로 본다.
+       "가습기무드등"에 키워드 "가습기" = 속성 포함(붙여쓴 상품명이 흔하다). */
+    const found = kwTokens.filter(function (t) {
+      if (tokens.indexOf(t) >= 0) return true;
+      if (codePoints(t) < 2) return false;
+      return tokens.some(function (x) { return x.length > t.length && x.indexOf(t) >= 0; });
+    }).length;
     if (m) {
       const at = codePoints(name.slice(0, m.index));
-      return { main: kw, exact: true, index: at, front: at <= frontChars, partial: 'exact', found: kwTokens.length, total: kwTokens.length };
+      return { main: kw, exact: true, index: at, front: at <= frontChars, partial: 'exact', found: kwTokens.length, total: kwTokens.length, matched: m[0] };
     }
+
+    /* 띄어쓰기가 어긋난 경우("가습기 무드등" vs "가습기무드등")를 잡는다. */
+    if (KT) {
+      const km = KT.match(name, kw);
+      if (km.total > 0) {
+        const pos = km.positions[0];
+        const at = codePoints(name.slice(0, pos.index));
+        return {
+          main: kw, exact: true, index: at, front: at <= frontChars, partial: 'exact',
+          found: kwTokens.length, total: kwTokens.length, matched: name.slice(pos.index, pos.index + pos.length),
+          spacing: 'relaxed',
+        };
+      }
+    }
+
     return {
       main: kw, exact: false, index: -1, front: false,
       partial: kwTokens.length && found === kwTokens.length ? 'all' : found ? 'some' : 'none',

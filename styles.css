@@ -1272,3 +1272,23 @@ main { max-width: var(--maxw); margin: 0 auto; padding: 34px 24px 64px; }
 /* 제안 카드도 흰 바탕 */
 .suggest { background: var(--surface); border-color: var(--line); }
 .suggest-top .s-label { background: var(--brand-soft); color: var(--accent); }
+
+/* ── 상품명 목록 일괄 채점 (엑셀·CSV) ─────────────────── */
+.bulk-panel { margin-top: 14px; }
+.bulk-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0 4px; }
+.file-btn { position: relative; overflow: hidden; }
+.file-btn input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.bulk-table { width: 100%; }
+.bulk-table th, .bulk-table td { font-size: 12px; }
+.bulk-table td.bulk-name { max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bulk-issue { font-size: 11px; color: var(--ink-3); }
+
+/* ── 무료 AI 맛보기 ───────────────────────────────────── */
+.free-taste { margin-top: 12px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-2); }
+.free-taste-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.free-taste-head strong { font-size: 12.5px; }
+.free-taste-head .muted { font-size: 11px; }
+.free-taste .bridge-result-actions { margin-top: 8px; }
+.free-limit { margin-top: 9px; padding: 10px 11px; border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent); border-radius: 9px; background: var(--amber-soft, #fff8e6); font-size: 11.5px; line-height: 1.6; }
+.free-limit b { display: block; margin-bottom: 3px; }
+.free-limit-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }

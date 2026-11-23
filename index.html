@@ -169,6 +169,28 @@
         </div>
       </div>
     </div>
+
+    <div class="panel bulk-panel" id="bulkPanel">
+      <div class="panel-head">
+        <h2>상품명 목록 일괄 채점 <span class="muted">엑셀 · CSV</span></h2>
+        <span class="muted" id="bulkStatus">1열 상품명 · 2열 키워드(선택)</span>
+      </div>
+      <div class="bulk-actions">
+        <label class="btn btn-ghost btn-sm file-btn">엑셀·CSV 올리기
+          <input id="bulkFile" type="file" accept=".xlsx,.xls,.csv,text/csv" hidden />
+        </label>
+        <button class="btn btn-ghost btn-sm" data-action="bulk-sample">예시 5개로 보기</button>
+        <button class="btn btn-primary btn-sm" data-action="bulk-export" id="bulkExport" disabled>결과 엑셀 다운로드</button>
+        <button class="btn btn-ghost btn-sm" data-action="bulk-clear" id="bulkClear" disabled>목록 비우기</button>
+      </div>
+      <div class="table-scroll" id="bulkTableWrap" hidden>
+        <table class="sim-table bulk-table">
+          <thead><tr><th>#</th><th>상품명</th><th>키워드</th><th>점수</th><th>등급</th><th>고칠 곳</th></tr></thead>
+          <tbody id="bulkRows"></tbody>
+        </table>
+      </div>
+      <p class="foot-note">엑셀 파일은 이 브라우저에서만 읽습니다. 서버로 보내지 않습니다. 머리글이 있으면 자동으로 건너뜁니다.</p>
+    </div>
   </section>
 
   <!-- ── 2. 상세 카피 ──────────────────────────────── -->
@@ -587,6 +609,19 @@
         </div>
         <div class="bridge-applied" id="bridgeApplied"></div>
 
+        <div class="free-taste" id="freeTaste">
+          <div class="free-taste-head">
+            <strong>키 없이 무료로 바로 실행</strong>
+            <span class="muted" id="freeStatus">하루 5회</span>
+          </div>
+          <div class="bridge-result-actions">
+            <button class="btn btn-primary btn-sm" data-action="free-run">무료 AI로 실행</button>
+            <span class="muted" id="freeRemain"></span>
+          </div>
+          <div class="free-limit" id="freeLimitCard" hidden></div>
+          <p class="foot-note">위 [1. 시킬 일]의 프롬프트를 그대로 보냅니다. 외부 AI 제공자로 전송되니 민감한 정보는 넣지 마세요.</p>
+        </div>
+
         <details class="gemini-api">
           <summary>선택: 무료 Gemini API 키로 바로 실행</summary>
           <p class="foot-note">키가 있으면 새 창 없이 이 화면에서 결과를 받습니다. 키는 이 브라우저(localStorage)에만 저장되고, 실행할 때만 Google 엔드포인트로 보냅니다. 무료 등급은 분당 요청 수 제한이 있습니다.</p>
@@ -754,6 +789,9 @@
 <script src="engines/pro-studio.js"></script>
 <script src="engines/copy-psych-engine.js"></script>
 <script src="engines/design-ref-engine.js"></script>
+<script src="engines/es-hangul.js"></script>
+<script src="engines/korean-text.js"></script>
+<script src="engines/free-ai-client.js"></script>
 <script src="core.js"></script>
 <script src="data.js"></script>
 <script src="app.js"></script>

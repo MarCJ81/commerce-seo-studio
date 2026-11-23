@@ -9,6 +9,8 @@
   const D = window.CommerceData;
   const P = window.ProConnector || null; // engines/pro-api-connector.js
   const PS = window.ProStudio ? window.ProStudio.create(P) : null; // engines/pro-studio.js
+  const FA = window.FreeAI || null;      // engines/free-ai-client.js (무료 AI 맛보기)
+  if (FA) FA.configure({ endpoint: 'https://free-ai-taste.goodday810202.workers.dev', app: 'commerce-seo-studio' });
   const $ = function (sel) { return document.querySelector(sel); };
   const $$ = function (sel) { return Array.prototype.slice.call(document.querySelectorAll(sel)); };
 
@@ -48,6 +50,10 @@
     bridge: { task: 'copy', result: '', copy: '', designNote: '', faqs: [], names: [] },
     /* Pro AI 완성 카피 (연결했을 때만 채워진다) */
     pro: { kit: null, meta: '', busy: false, at: '' },
+    /* 무료 AI 맛보기 */
+    free: { busy: false },
+    /* 상품명 목록 일괄 채점 */
+    bulk: [],
     items: [],
     filter: 'all',
     sort: 'recent',
@@ -1167,6 +1173,181 @@
     }).catch(function (err) {
       toast('Gemini 호출 실패: ' + (err && err.message ? err.message : '알 수 없는 오류'), 'warn');
     }).then(restore, restore);
+  }
+
+  /* ── 무료 AI 맛보기 (Cloudflare Worker) ─────────────────
+     503(제공자 혼잡)은 클라이언트가 1회 자동 재시도, 429(한도)는 전환 카드. */
+
+  function renderFreeLimit(res) {
+    const card = $('#freeLimitCard');
+    const st = $('#freeStatus');
+    if (st) st.textContent = '오늘 무료 횟수를 다 썼어요';
+    if (!card) return;
+    const cta = (res && res.cta) || {};
+    const href = cta.keyUrl || 'https://aistudio.google.com/apikey';
+    card.hidden = false;
+    card.innerHTML =
+      '<b>무료 체험을 다 쓰셨서요</b>' +
+      '<div>' + String((res && res.message) || '오늘 무료 횟수를 모두 썼어요. 내 키나 구독 AI로 이어서 살 수 있어요.').replace(/</g, '&lt;') + '</div>' +
+      '<div class="free-limit-actions">' +
+        '<a class="btn btn-primary btn-sm" href="' + href + '" target="_blank" rel="noopener noreferrer">내 무료 Gemini 키 연결</a>' +
+        '<button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(\'geminiKey\')&&document.getElementById(\'geminiKey\').focus()">키 입력칸으로</button>' +
+      '</div>';
+  }
+
+  function runFree() {
+    if (!FA) { toast('무료 체험 엔진을 불러오지 못했어요', 'warn'); return; }
+    if (state.free.busy) return;
+    const p = lastPrompt || currentPrompt();
+    if (!p || !p.prompt) { toast('먼저 [1. 시킬 일]에서 프롬프트를 만들어 주세요', 'warn'); return; }
+    state.free.busy = true;
+    const btn = $('[data-action="free-run"]');
+    if (btn) { btn.disabled = true; btn.textContent = '무료 AI가 쓰는 중…'; }
+    const st = $('#freeStatus');
+    if (st) st.textContent = '무료로 생성 중… (5~20초)';
+    const card = $('#freeLimitCard');
+    if (card) card.hidden = true;
+    const restore = function () {
+      state.free.busy = false;
+      if (btn) { btn.disabled = false; btn.textContent = '무료 AI로 실행'; }
+    };
+    FA.routeWith(P, { task: 'text', prompt: p.prompt, options: { temperature: 0.6, maxTokens: 900 } }, { timeoutMs: 45000 })
+      .then(function (res) {
+        restore();
+        if (res && res.ok) {
+          $('#bridgeResult').value = res.text;
+          state.bridge.result = res.text;
+          renderBridgeApplied();
+          if (st) st.textContent = '무료로 받았어요' + (res.provider ? ' · ' + res.provider : '');
+          const rem = $('#freeRemain');
+          if (rem && res.remaining !== undefined && res.remaining !== null) rem.textContent = '남은 무료 ' + res.remaining + '/' + (res.limit || 5) + '회';
+          toast('결과를 받았어요 · [결과 적용]을 누르세요');
+          return;
+        }
+        if (FA.isQuota(res)) { renderFreeLimit(res); return; }
+        if (st) st.textContent = (res && res.message) || '무료 체험 중 문제가 생겼어요.';
+        toast((res && res.message) || '무료 체험에 실패했어요', 'warn');
+      }, function () {
+        restore();
+        toast('무료 체험에 연결하지 못했어요', 'warn');
+      });
+  }
+
+  /* ── 상품명 목록 일괄 채점 (SheetJS 지연 로딩) ─────────────── */
+
+  let xlsxLoading = null;
+  function loadXLSX() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    if (xlsxLoading) return xlsxLoading;
+    xlsxLoading = new Promise(function (resolve, reject) {
+      const s = document.createElement('script');
+      s.src = 'assets/vendor/xlsx.full.min.js';
+      s.async = true;
+      s.onload = function () { resolve(window.XLSX); };
+      s.onerror = function () { xlsxLoading = null; reject(new Error('엑셀 엔진을 불러오지 못했어요')); };
+      document.head.appendChild(s);
+    });
+    return xlsxLoading;
+  }
+
+  function bulkRowsFromMatrix(matrix) {
+    const rows = [];
+    (matrix || []).forEach(function (row) {
+      if (!row) return;
+      const cells = row.map(function (c) { return String(c == null ? '' : c).trim(); });
+      const name = cells[0] || '';
+      if (!name) return;
+      if (/상품명|제품명|product/i.test(name) && rows.length === 0) return;  /* 머리글 */
+      rows.push({ name: name, keyword: cells[1] || '' });
+    });
+    return rows.slice(0, 500);
+  }
+
+  function renderBulk() {
+    const wrap = $('#bulkTableWrap');
+    const body = $('#bulkRows');
+    const exp = $('#bulkExport');
+    const clr = $('#bulkClear');
+    const st = $('#bulkStatus');
+    if (!body) return;
+    if (exp) exp.disabled = !state.bulk.length;
+    if (clr) clr.disabled = !state.bulk.length;
+    if (wrap) wrap.hidden = !state.bulk.length;
+    if (st) {
+      st.textContent = state.bulk.length
+        ? state.bulk.length + '건 · 평균 ' + Math.round(state.bulk.reduce(function (s, r) { return s + r.total; }, 0) / state.bulk.length) + '점'
+        : '1열 상품명 · 2열 키워드(선택)';
+    }
+    body.innerHTML = state.bulk.map(function (r, i) {
+      const issue = r.topIssue ? '<span class="bulk-issue">' + String(r.topIssue).replace(/</g, '&lt;') + '</span>' : '<span class="muted">—</span>';
+      return '<tr><td>' + (i + 1) + '</td><td class="bulk-name">' + String(r.name).replace(/</g, '&lt;') + '</td>' +
+        '<td>' + String(r.keyword || '—').replace(/</g, '&lt;') + '</td>' +
+        '<td><b>' + r.total + '</b></td>' +
+        '<td><span class="badge grade ' + r.grade.toLowerCase() + '">' + r.grade + '</span></td>' +
+        '<td>' + issue + '</td></tr>';
+    }).join('');
+  }
+
+  function scoreBulk(list) {
+    const kw = state.keyword;
+    state.bulk = list.map(function (row) {
+      const a = C.analyzeName({ platform: state.platform, name: row.name, keyword: row.keyword || kw });
+      const top = (a.issues || []).filter(function (i) { return i.level !== 'good'; })[0];
+      return {
+        name: row.name, keyword: row.keyword || kw,
+        total: a.total, grade: a.grade,
+        topIssue: top ? top.title : '',
+        suggestion: (a.suggestions && a.suggestions[0] && a.suggestions[0].text) || '',
+      };
+    });
+    renderBulk();
+  }
+
+  function importBulkFile(file) {
+    if (!file) return;
+    const st = $('#bulkStatus');
+    if (st) st.textContent = file.name + ' 읽는 중…';
+    loadXLSX().then(function (XLSX) {
+      return file.arrayBuffer().then(function (buf) {
+        const wb = XLSX.read(buf, { type: 'array' });
+        const sheet = wb.Sheets[wb.SheetNames[0]];
+        const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false, defval: '' });
+        const list = bulkRowsFromMatrix(matrix);
+        if (!list.length) { toast('읽을 상품명이 없어요. 1열에 상품명을 넣어 주세요', 'warn'); if (st) st.textContent = '읽을 행이 없어요'; return; }
+        scoreBulk(list);
+        toast(list.length + '건을 채점했어요');
+      });
+    }).catch(function (err) {
+      toast((err && err.message) || '파일을 읽지 못했어요', 'warn');
+      if (st) st.textContent = '파일을 읽지 못했어요';
+    });
+  }
+
+  function exportBulk() {
+    if (!state.bulk.length) return;
+    loadXLSX().then(function (XLSX) {
+      const aoa = [['상품명', '키워드', '점수', '등급', '고칠 곳', '추천 상품명']];
+      state.bulk.forEach(function (r) { aoa.push([r.name, r.keyword, r.total, r.grade, r.topIssue, r.suggestion]); });
+      const ws = XLSX.utils.aoa_to_sheet(aoa);
+      ws['!cols'] = [{ wch: 44 }, { wch: 18 }, { wch: 6 }, { wch: 6 }, { wch: 34 }, { wch: 44 }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '상품명 채점');
+      XLSX.writeFile(wb, '상품명-일괄채점-' + C.todayISO() + '.xlsx');
+      toast('엑셀로 저장했어요');
+    }).catch(function (err) {
+      toast((err && err.message) || '엑셀을 만들지 못했어요', 'warn');
+    });
+  }
+
+  function bulkSample() {
+    scoreBulk([
+      { name: '무선 핸디 청소기 가정용 미니 진공 청소기', keyword: '무선 청소기' },
+      { name: '고양이 모래 먼지 없는 벤토나이트 10L', keyword: '고양이 모래' },
+      { name: '원룸 미니 가습기 무드등 겸용 USB', keyword: '미니 가습기' },
+      { name: '★최고급★ 캠핑 의자 접이식 초경량 1개', keyword: '캠핑 의자' },
+      { name: '아기 물티슈 캡형 100매 10팩', keyword: '아기 물티슈' },
+    ]);
+    toast('예시 5건을 채점했어요');
   }
 
   /* ── 마진 ─────────────────────────────────────────── */
@@ -2369,6 +2550,7 @@
           state.bridge.result = '';
           $('#bridgeResult').value = '';
           renderBridgeApplied();
+          if ($('#freeLimitCard')) $('#freeLimitCard').hidden = true;
           break;
         case 'save-gemini-key': {
           const v = String(($('#geminiKey') || {}).value || '').trim();
@@ -2386,6 +2568,10 @@
           toast('저장한 키를 지웠어요');
           break;
         case 'run-gemini': runGemini(); break;
+        case 'free-run': runFree(); break;
+        case 'bulk-sample': bulkSample(); break;
+        case 'bulk-export': exportBulk(); break;
+        case 'bulk-clear': state.bulk = []; renderBulk(); toast('일괄 목록을 비웠어요'); break;
         case 'apply-ai-name': {
           const n = state.bridge.names[Number(target.getAttribute('data-index'))];
           if (!n) break;
@@ -2506,6 +2692,16 @@
       }).join('');
     }
     updateGeminiNote();
+
+    const bulkFile = $('#bulkFile');
+    if (bulkFile) {
+      bulkFile.addEventListener('change', function (e) {
+        const f = e.target.files && e.target.files[0];
+        if (f) importBulkFile(f);
+        e.target.value = '';
+      });
+    }
+    renderBulk();
 
     const storedCompet = readJSON(LS.compet, []);
     state.compet.rows = Array.isArray(storedCompet)
