@@ -1195,11 +1195,24 @@
       '</div>';
   }
 
+  /* 무료 체험은 짧은 결과만 받는다(Worker 12초 제한 실측). Pro/브리지는 그대로 전체 카피. */
+  function freePrompt() {
+    const name = String(state.name || '').trim();
+    const kw = String(state.keyword || '').trim();
+    const target = String(state.target || '').trim();
+    if (!name && !kw) return '';
+    return '너는 스마트스토어 상품명·상세 카피 작가다. ' +
+      (name ? '상품명: ' + name + '. ' : '') +
+      (kw ? '목표 키워드: ' + kw + '. ' : '') +
+      (target ? '고객: ' + target + '. ' : '') +
+      '상품명 후보 5개(각 30자 이내)와 상세 첫 문단 3줄을 써라. 과장·최상급·보장 표현 금지. 600자 이내.';
+  }
+
   function runFree() {
     if (!FA) { toast('무료 체험 엔진을 불러오지 못했어요', 'warn'); return; }
     if (state.free.busy) return;
-    const p = lastPrompt || currentPrompt();
-    if (!p || !p.prompt) { toast('먼저 [1. 시킬 일]에서 프롬프트를 만들어 주세요', 'warn'); return; }
+    const p = { prompt: freePrompt() };
+    if (!p.prompt) { toast('상품명이나 키워드를 먼저 입력해 주세요', 'warn'); return; }
     state.free.busy = true;
     const btn = $('[data-action="free-run"]');
     if (btn) { btn.disabled = true; btn.textContent = '무료 AI가 쓰는 중…'; }
@@ -1211,7 +1224,7 @@
       state.free.busy = false;
       if (btn) { btn.disabled = false; btn.textContent = '무료 AI로 실행'; }
     };
-    FA.routeWith(P, { task: 'text', prompt: p.prompt, options: { temperature: 0.6, maxTokens: 900 } }, { timeoutMs: 45000 })
+    FA.routeWith(P, { task: 'text', prompt: p.prompt, options: { temperature: 0.6, maxTokens: 600 } }, { timeoutMs: 45000 })
       .then(function (res) {
         restore();
         if (res && res.ok) {
