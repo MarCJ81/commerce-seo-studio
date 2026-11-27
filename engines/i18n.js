@@ -42,15 +42,63 @@
 
   function has(obj, key) { return Object.prototype.hasOwnProperty.call(obj, key); }
 
+  var LOOK_DEPTH = 0;
+
+  // 규칙 치환: $n 자리에 들어가는 조각도 사전으로 한 번 더 번역한다.
+  // (예: "타이어 4짝 교체 (장착·밸런스 포함) 시세 자세히 보기")
+  function applyRule(re, repl, s) {
+    var groups = [], matched = false;
+    s.replace(re, function () {
+      matched = true;
+      groups = Array.prototype.slice.call(arguments, 1, arguments.length - 2);
+      return '';
+    });
+    if (!matched) return null;
+    var caps = [];
+    for (var i = 0; i < groups.length; i++) {
+      var g = groups[i];
+      if (g == null) { caps.push(''); continue; }
+      if (!HANGUL.test(g) || LOOK_DEPTH > 3) { caps.push(g); continue; }
+      LOOK_DEPTH++;
+      var t = lookup(norm(g));
+      LOOK_DEPTH--;
+      caps.push((t != null && !HANGUL.test(t)) ? t : g);
+    }
+    return repl.replace(/\$(\d+)/g, function (all, n) {
+      var i = (+n) - 1;
+      return caps[i] != null ? caps[i] : all;
+    });
+  }
+
   function lookup(key) {
     if (has(EXACT, key)) return EXACT[key];
     for (var i = 0; i < RULES.length; i++) {
-      if (RULES[i][0].test(key)) return key.replace(RULES[i][0], RULES[i][1]);
+      if (RULES[i][0].test(key)) {
+        var out = applyRule(RULES[i][0], RULES[i][1], key);
+        if (out != null) return out;
+      }
     }
     return null;
   }
 
   function norm(s) { return s.replace(/\s+/g, ' ').trim(); }
+
+  function fmtWon(n) {
+    var s = String(Math.round(n));
+    return s.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  // 한국식 금액 표기(1,234원 / 217.1만 / 89만 원)를 ₩ 표기로 바꾼다 (영어 모드 전용)
+  function normKoNumbers(s) {
+    var out = s;
+    out = out.replace(/(\d[\d,]*(?:\.\d+)?)\s*만\s*원/g, function (m, a) {
+      return '₩' + fmtWon(parseFloat(a.replace(/,/g, '')) * 10000);
+    });
+    out = out.replace(/(\d[\d,]*(?:\.\d+)?)\s*만(?![가-힣])/g, function (m, a) {
+      return '₩' + fmtWon(parseFloat(a.replace(/,/g, '')) * 10000);
+    });
+    out = out.replace(/(\d[\d,]*)\s*원/g, function (m, a) { return '₩' + a; });
+    return out;
+  }
 
   function translatePlain(text) {
     var core = norm(text);
@@ -83,11 +131,20 @@
       }
     }
     if (out != null && !HANGUL.test(out)) return out;
+    // 금액 표기를 영어식으로 바꾼 뒤 다시 찾는다.
+    var work = core;
+    var cn = normKoNumbers(core);
+    if (cn !== core) {
+      if (!HANGUL.test(cn)) return cn;
+      var on = lookup(cn);
+      if (on != null && !HANGUL.test(on)) return on;
+      work = cn;
+    }
     // 사전에 통짜 항목이 없을 때: 원문을 "라벨 · 값" 단위로 나눠 조각별로 찾는다.
     // 한글이 없는 조각(영문 브랜드·숫자)은 그대로 둔다.
     var seps2 = [' · ', ' — ', ' / '];
     for (var sj = 0; sj < seps2.length; sj++) {
-      var srcz = core.split(seps2[sj]);
+      var srcz = work.split(seps2[sj]);
       if (srcz.length < 2) continue;
       var okAll2 = true, done2 = [];
       for (var pj = 0; pj < srcz.length; pj++) {
@@ -99,7 +156,7 @@
       }
       if (okAll2) {
         var joined = done2.join(seps2[sj]);
-        if (joined !== core) return joined;
+        if (joined !== work) return joined;
       }
     }
     return out;
@@ -251,7 +308,12 @@
         if (r.type === 'childList') {
           for (var j = 0; j < r.addedNodes.length; j++) {
             var n = r.addedNodes[j];
-            if (n.nodeType === 3 ? HANGUL.test(n.nodeValue || '') : (n.nodeType === 1 && HANGUL.test(n.textContent || ''))) { schedule(); return; }
+            if (n.nodeType === 3) {
+              if (HANGUL.test(n.nodeValue || '')) { schedule(); return; }
+            } else if (n.nodeType === 1) {
+              // 새로 그려진 요소는 속성(placeholder·aria-label 등)만 한글일 수 있다.
+              if (HANGUL.test(n.textContent || '') || HANGUL.test(n.outerHTML || '')) { schedule(); return; }
+            }
           }
         } else if (r.type === 'characterData') {
           if (HANGUL.test(r.target.nodeValue || '')) { schedule(); return; }
