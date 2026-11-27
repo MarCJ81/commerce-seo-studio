@@ -56,8 +56,9 @@
     var core = norm(text);
     if (!core || !HANGUL.test(core)) return null;
     var out = lookup(core);
-    if (out == null) { misses[core] = (misses[core] || 0) + 1; return null; }
-    if (HANGUL.test(out)) {
+    if (out == null) {
+      misses[core] = (misses[core] || 0) + 1;
+    } else if (HANGUL.test(out)) {
       // 짧은 문구는 사전 키를 부분 치환해 본다 (예: "Delete 겨울 가습기 관리법")
       if (core.length <= 60) {
         var keys = Object.keys(EXACT).sort(function (a, b) { return b.length - a.length; });
@@ -81,8 +82,29 @@
         if (okAll) return done.join(seps[si]);
       }
     }
+    if (out != null && !HANGUL.test(out)) return out;
+    // 사전에 통짜 항목이 없을 때: 원문을 "라벨 · 값" 단위로 나눠 조각별로 찾는다.
+    // 한글이 없는 조각(영문 브랜드·숫자)은 그대로 둔다.
+    var seps2 = [' · ', ' — ', ' / '];
+    for (var sj = 0; sj < seps2.length; sj++) {
+      var srcz = core.split(seps2[sj]);
+      if (srcz.length < 2) continue;
+      var okAll2 = true, done2 = [];
+      for (var pj = 0; pj < srcz.length; pj++) {
+        var rawSeg = srcz[pj];
+        if (!HANGUL.test(rawSeg)) { done2.push(rawSeg); continue; }
+        var trs = lookup(norm(rawSeg));
+        if (trs == null) { okAll2 = false; break; }
+        done2.push(trs);
+      }
+      if (okAll2) {
+        var joined = done2.join(seps2[sj]);
+        if (joined !== core) return joined;
+      }
+    }
     return out;
   }
+
 
   var ATTRS = ['placeholder', 'title', 'aria-label', 'alt', 'data-tip', 'data-label', 'data-empty', 'data-hint', 'data-note', 'data-title'];
 
