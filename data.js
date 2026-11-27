@@ -8,7 +8,7 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const SAMPLES = [
+  let SAMPLES = [
     {
       id: 'sample-before',
       label: '개선 전 예시',
@@ -51,7 +51,7 @@
 
   /* 경쟁강도 계산기 예시 — 무선 청소기 인접 키워드.
      PC·모바일 검색수와 네이버 쇼핑 등록 상품수 자리. 실제 수치는 직접 조회해 넣는다. */
-  const COMPETITION_SAMPLES = [
+  let COMPETITION_SAMPLES = [
     { keyword: '무선 청소기', pc: 24000, mobile: 71000, products: 412000 },
     { keyword: '차량용 청소기', pc: 5400, mobile: 16800, products: 52000 },
     { keyword: '핸디 청소기', pc: 8200, mobile: 24500, products: 68000 },
@@ -74,6 +74,44 @@
     designV2:
       '레퍼런스 검색 링크는 누를 때만 핀터레스트·비핸스를 새 창으로 엽니다. 블루프린트 JSON은 내가 붙여넣은 내용만 브라우저에서 해석하며, 브랜드 키트는 이 브라우저(localStorage)에만 저장됩니다.',
   };
+
+
+  if (typeof window !== 'undefined' && window.ONETAP_LANG === 'en') {
+    SAMPLES = [
+      {
+        id: 'sample-before', label: 'Before', hint: 'Symbols, repetition and hype in one title',
+        platform: 'smartstore',
+        name: '[OurMarket] ★BEST★ cordless vacuum cordlessvacuum value freeshipping No.1 vacuum absolutely cheapest top pick popular item',
+        keyword: 'cordless vacuum', target: 'renters in a studio flat',
+        benefits: ['light enough for one hand', 'HEPA filter traps fine dust', '40 minutes per charge'],
+        weakness: 'a little loud', margin: { price: 59000, cost: 24000, shipping: 3000, feeRate: 10, adCost: 9000 },
+      },
+      {
+        id: 'sample-after', label: 'After', hint: 'Brand + type + spec, in that order',
+        platform: 'coupang',
+        name: 'Moa cordless handheld vacuum M2 15000Pa HEPA 40 min',
+        keyword: 'cordless handheld vacuum', target: 'renters in a studio flat',
+        benefits: ['light enough for one hand', 'HEPA filter traps fine dust', '40 minutes per charge'],
+        weakness: 'a little loud', margin: { price: 59000, cost: 24000, shipping: 3000, feeRate: 10, adCost: 9000 },
+      },
+      {
+        id: 'sample-sealer', label: 'Sealer example', hint: 'For checking the screen with another category',
+        platform: 'smartstore',
+        name: 'Hangyeol vacuum sealer H200 2-pack food packing',
+        keyword: 'vacuum sealer', target: 'people batch-cooking for one',
+        benefits: ['press-to-seal, no manual needed', '30 cm seal width fits large bags', 'removable drip tray'],
+        weakness: 'about 20 seals per charge', margin: { price: 32900, cost: 12800, shipping: 2500, feeRate: 5, adCost: 6000 },
+      },
+    ];
+    COMPETITION_SAMPLES = [
+      { keyword: 'cordless vacuum', pc: 24000, mobile: 71000, products: 412000 },
+      { keyword: 'car vacuum', pc: 5400, mobile: 16800, products: 52000 },
+      { keyword: 'handheld vacuum', pc: 8200, mobile: 24500, products: 68000 },
+      { keyword: 'bed vacuum', pc: 4200, mobile: 15800, products: 31000 },
+      { keyword: 'studio vacuum', pc: 3100, mobile: 12400, products: 9800 },
+      { keyword: 'camping vacuum', pc: 1800, mobile: 6200, products: 540 },
+    ];
+  }
 
   return { SAMPLES: SAMPLES, FEE_PRESETS: FEE_PRESETS, COMPETITION_SAMPLES: COMPETITION_SAMPLES, NOTES: NOTES };
 });

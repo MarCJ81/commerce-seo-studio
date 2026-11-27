@@ -699,6 +699,7 @@
   }
 
   function buildCopyKit(input) {
+    if (typeof window !== 'undefined' && window.ONETAP_LANG === 'en') return buildCopyKitEN(input);
     const o = input || {};
     const name = cleanText(o.name, '이 상품');
     const target = cleanText(o.target, '이 상품을 찾는 분');
@@ -844,6 +845,141 @@
       headlines: headlines, sections: sections, faqs: faqs,
       fullText: fullText,
     };
+  }
+
+
+  /* ==========================================================
+     English copy kit (EN UI). Korean builder unchanged.
+     ========================================================== */
+  function buildCopyKitEN(input) {
+    const o = input || {};
+    const name = cleanText(o.name, 'this product');
+    const target = cleanText(o.target, 'shoppers looking for this');
+    const raw = Array.isArray(o.benefits) ? o.benefits : [];
+    const b1 = cleanText(raw[0], 'the main feature');
+    const b2 = cleanText(raw[1], '');
+    const b3 = cleanText(raw[2], '');
+    const weakness = cleanText(o.weakness, '');
+    const keyword = cleanText(o.keyword, '');
+    const benefits = [b1, b2, b3].filter(Boolean);
+
+    const headlines = [
+      { type: 'Numeric', text: '3 things ' + target + ' should check before buying ' + name },
+      { type: 'Question', text: b1 + ' — do you actually need it?' },
+      { type: 'Reversal', text: 'Why I never went back after trying ' + name + ' once' },
+      { type: 'Comparison', text: 'Same price range: the one thing that sets ' + name + ' apart' },
+      { type: 'Loss aversion', text: 'Why ' + target + ' end up paying twice' + (weakness ? ' — ' + weakness : '') },
+    ].map(function (h) { return { type: h.type, text: h.text, length: codePoints(h.text) }; });
+
+    const sections = [];
+    sections.push({
+      id: 'empathy', no: 1, title: 'Empathy',
+      lead: 'If you are ' + target + ', ' + (weakness ? weakness + ' is probably the part that stops you.' : 'there is a moment where you just buy whatever looks fine.'),
+      body: 'The same goes for ' + name + '. The photos look right, but what matters first is whether it fits your situation and lasts. So this page does not start with a brag — it starts with what changes, in order.',
+      bullets: [
+        'Written around how ' + target + ' actually use it',
+        'Specs as numbers, weak points left in',
+        'What to check before buying, and what to check after',
+      ],
+    });
+    sections.push({
+      id: 'problem', no: 2, title: 'Problem',
+      lead: 'Three things go wrong with products in this category.',
+      body: 'Choosing on price alone gets ' + target + ' something other than what they wanted. Check these three before you pick ' + name + '.',
+      bullets: [
+        b1 + ' — if this is vague, you buy again later',
+        (b2 || 'If the numbers are missing') + ', you only find out after using it',
+        weakness ? weakness + ' — this is where most people give up' : 'No guidance on which criteria matter',
+      ],
+    });
+    sections.push({
+      id: 'solution', no: 3, title: 'Fix',
+      lead: name + ' addresses these three at once.',
+      body: benefits.map(function (b) { return b + '.'; }).join(' '),
+      bullets: benefits.map(function (b) { return b; }),
+    });
+    sections.push({
+      id: 'spec', no: 4, title: 'Specs',
+      lead: 'Start with the table. Without numbers there is nothing to compare.',
+      body: 'Fill in weight, size, capacity, material and certification where you have them. Every blank you leave becomes a question in your inbox.',
+      bullets: ['Weight and size', 'Capacity and runtime', 'Material and certification'],
+    });
+    sections.push({
+      id: 'compare', no: 5, title: 'Comparison',
+      lead: 'At the same price, what is left is the difference.',
+      body: 'The table below compares three axes: ' + benefits.slice(0, 3).join(', ') + '. Fill it with real values, including the ones that do not favour you.',
+      table: {
+        columns: ['Item', name, 'Typical alternative'],
+        rows: [['Price', '', ''], [b1, '', ''], [(b2 || 'Build'), '', ''], [(weakness || 'Weak point'), '', '']],
+      },
+      bullets: [],
+    });
+    sections.push({
+      id: 'review', no: 6, title: 'Expected reviews',
+      lead: 'No reviews yet is fine.',
+      body: 'Knowing what customers will write lets you answer faster. Prepare these three answers for your first ten reviews, and quote the customer’s own words rather than pasting a template.',
+      bullets: [
+        'Customers who confirm ' + b1 + ' and say it matched expectations',
+        'Customers who say ' + (weakness || 'the weak point') + ' turned out fine',
+        'Customers asking about fit for their home or use',
+      ],
+    });
+    sections.push({
+      id: 'cta', no: 7, title: 'Call to action',
+      lead: 'If you are still hesitating, check one thing.',
+      body: (weakness ? 'You named ' + weakness + ' as the downside — if that is acceptable, ' : 'If the options and what is in the box fit, ') + name + ' is worth the price. If ' + b1 + ' is not something you need, this is not for you.',
+      bullets: [
+        'Before ordering: check the option spec, contents and delivery note',
+        'On arrival: report any initial fault straight away',
+        'Questions: leave them in the channel at the bottom of the page',
+      ],
+      closing: name + ' — only what you actually need.',
+    });
+
+    sections.forEach(function (s) {
+      const lines = [s.lead, s.body];
+      if (s.table) {
+        lines.push('| ' + s.table.columns.join(' | ') + ' |');
+        lines.push('| ' + s.table.columns.map(function () { return '---'; }).join(' | ') + ' |');
+        s.table.rows.forEach(function (r) { lines.push('| ' + r.join(' | ') + ' |'); });
+      }
+      if (s.bullets && s.bullets.length) lines.push(s.bullets.map(function (b) { return '· ' + b; }).join('\n'));
+      if (s.closing) lines.push(s.closing);
+      s.copy = lines.join('\n\n');
+    });
+
+    const faqs = [
+      { q: 'How long does delivery take?', a: 'Orders ship in sequence once payment clears. The exact date is on the option’s delivery note and the courier tracking. Weekends and public holidays can add a day.' },
+      { q: 'Is it hard to use the first time?', a: b1 + ' — that is what this was built around, and the contents and order of use are in the spec table above. One run through the manual is enough.' },
+      { q: 'Will it fit my situation?', a: 'Check the option size and capacity first, then ' + (b2 || 'the usage conditions') + '. If it is unclear, tell us how you plan to use it in the enquiry and we will confirm.' },
+      { q: 'Can I exchange a faulty unit?', a: 'Initial faults are exchanged or repaired as soon as they are confirmed. Change of mind is covered within 7 days of delivery; if opening or use has reduced the value, it may be limited.' },
+      { q: 'Is ' + b1 + ' really different?', a: 'Even with the same feature, ' + (b2 || 'the way it works') + ' is where the difference shows. The comparison table above breaks it down by item.' },
+    ].map(function (f, i) { return { no: i + 1, q: f.q, a: f.a }; });
+
+    const fullText = buildKitTextEN({ name: name, target: target, keyword: keyword, headlines: headlines, sections: sections, faqs: faqs });
+
+    return { name: name, target: target, keyword: keyword, benefits: benefits, weakness: weakness, headlines: headlines, sections: sections, faqs: faqs, fullText: fullText };
+  }
+
+  function buildKitTextEN(kit) {
+    const lines = [];
+    lines.push('[Product] ' + kit.name);
+    if (kit.target) lines.push('[Target] ' + kit.target);
+    if (kit.keyword) lines.push('[Keyword] ' + kit.keyword);
+    lines.push('');
+    lines.push('■ 5 hook headlines');
+    kit.headlines.forEach(function (h, i) { lines.push((i + 1) + '. (' + h.type + ') ' + h.text); });
+    lines.push('');
+    lines.push('■ Seven-step product page');
+    kit.sections.forEach(function (s) {
+      lines.push('');
+      lines.push(s.no + '. ' + s.title);
+      lines.push(s.copy);
+    });
+    lines.push('');
+    lines.push('■ 5 likely FAQs');
+    kit.faqs.forEach(function (f) { lines.push('Q' + f.no + '. ' + f.q); lines.push('A' + f.no + '. ' + f.a); });
+    return lines.join('\n');
   }
 
   function buildKitText(kit) {
